@@ -1,0 +1,6 @@
+{
+  "items": [
+    {"noun": "eggs", "qty": 1, "unit": "ea"},
+    {"noun": "bread", "qty": 1, "unit": "ea"}
+  ]
+}

@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+.env
+.env.*
+.venv/
+.provisions/
+profile.json
+state.json
+selection.json
+plan.json
+plan-template.json
+seed-items.json
+meal_photos.json
+snapshot.html
+exports/
+*.bak

@@ -1,0 +1,32 @@
+{
+  "version": "provisions.plan.v1",
+  "slots": [
+    {
+      "id": "breakfast",
+      "title": "breakfast",
+      "options": [
+        {
+          "id": "eggs-on-toast",
+          "name": "Eggs on toast",
+          "serves": 2,
+          "summary": "Cook fresh",
+          "reason": "An example meal. Replace this with a reason relevant to the person you are planning for.",
+          "preference_key": "meal:eggs-on-toast",
+          "preference": "",
+          "items": [{"noun": "eggs"}, {"noun": "bread"}]
+        }
+      ]
+    }
+  ],
+  "topups": [
+    {
+      "id": "milk",
+      "noun": "milk",
+      "name": "Milk",
+      "preference_key": "item:milk",
+      "preference": "Light milk, high protein",
+      "reason": "Demonstrates an editable agent suggestion. This is sample data, not a default for every user.",
+      "items": [{"noun": "milk"}]
+    }
+  ]
+}

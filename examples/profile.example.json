@@ -1,0 +1,8 @@
+{
+  "store": "",
+  "fulfilment": "",
+  "catalogue": "agent",
+  "fees": {"pickup": 0, "bags": 0},
+  "preferences": {},
+  "resolver_rules": {}
+}

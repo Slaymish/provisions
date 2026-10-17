@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Provisions</title>
+<style>
+:root {
+  --paper:#f8f6f0;
+  --ink:#27352c;
+  --rule:#d9dcd1;
+  --grey:#70766b;
+  --green:#304d3c;
+  --wash:#eaf0e6;
+  --mark:#9d4b31
+}
+* {
+  box-sizing:border-box
+}
+html {
+  scroll-behavior:smooth;
+  scroll-padding-bottom:110px
+}
+body {
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font:15px/1.5 -apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
+  padding:0 40px 120px
+}
+button,input,textarea {
+  font:inherit
+}
+button,a,input,textarea {
+  -webkit-tap-highlight-color:transparent
+}
+button {
+  cursor:pointer
+}
+button:disabled {
+  cursor:wait;
+  opacity:.6
+}
+a {
+  color:inherit
+}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible {
+  outline:2px solid var(--mark);
+  outline-offset:4px
+}
+[hidden] {
+  display:none!important
+}
+.sheet {
+  max-width:780px;
+  margin:auto
+}
+.sheet.plan-active {
+  max-width:1120px
+}
+header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:28px 0 22px;
+  border-bottom:1px solid var(--ink)
+}
+h1 {
+  font:30px/1 Georgia,serif;
+  letter-spacing:-1.3px;
+  margin:0
+}
+h1 a {
+  text-decoration:none
+}
+.where {
+  font-size:11px;
+  line-height:1.7;
+  color:var(--grey);
+  text-align:right
+}
+.brand-note {
+  font-size:10px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  margin-top:9px;
+  color:var(--grey)
+}
+.tabs {
+  display:flex;
+  gap:26px;
+  margin:0;
+  border-bottom:1px solid var(--rule)
+}
+.tabs a {
+  padding:17px 0 13px;
+  font-size:12px;
+  text-decoration:none;
+  color:var(--grey);
+  border-bottom:2px solid transparent;
+  margin-bottom:-1px
+}
+.tabs a[aria-current] {
+  color:var(--ink);
+  border-color:var(--ink)
+}
+#message:empty {
+  display:none
+}
+#message {
+  padding:12px 0;
+  color:var(--mark)
+}
+.plan-heading {
+  display:flex;
+  justify-content:space-between;
+  align-items:end;
+  gap:30px;
+  margin:44px 0 42px
+}
+.eyebrow {
+  font-size:10px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--grey);
+  margin:0 0 11px
+}
+.plan-heading h2 {
+  font:clamp(38px,5vw,58px)/1.08 Georgia,serif;
+  letter-spacing:-2px;
+  margin:0 0 14px;
+  font-weight:400
+}
+.plan-intro {
+  font-size:14px;
+  color:var(--grey);
+  max-width:46ch;
+  margin:0
+}
+.week-label {
+  font:italic 18px Georgia,serif;
+  white-space:nowrap;
+  padding-bottom:5px;
+  color:var(--grey)
+}
+.meal {
+  margin:0 0 42px
+}
+.section-heading {
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  border-top:1px solid var(--rule);
+  padding-top:18px;
+  margin-bottom:18px;
+  gap:20px
+}
+.section-heading h2 {
+  font:27px/1.2 Georgia,serif;
+  letter-spacing:-.5px;
+  margin:0;
+  text-transform:capitalize
+}
+.section-number {
+  font:11px ui-monospace,monospace;
+  color:var(--grey);
+  margin-right:14px;
+  vertical-align:middle;
+  letter-spacing:0
+}
+.section-caption {
+  font-size:11px;
+  color:var(--grey)
+}
+.meal-options {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:22px
+}
+.meal-card {
+  min-width:0
+}
+.meal-option {
+  position:relative;
+  display:block;
+  width:100%;
+  padding:0;
+  border:0;
+  text-align:left;
+  background:none;
+  color:var(--ink)
+}
+.photo-wrap {
+  position:relative;
+  overflow:hidden;
+  background:#e5e7dd;
+  aspect-ratio:3/2;
+  border-radius:3px
+}
+.meal-image {
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:transform .3s
+}
+.meal-option:hover .meal-image {
+  transform:scale(1.035)
+}
+.choice-mark {
+  position:absolute;
+  right:12px;
+  top:12px;
+  width:25px;
+  height:25px;
+  border:1px solid #ffffffcc;
+  background:#ffffffdf;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  font-size:13px;
+  color:transparent;
+  box-shadow:0 1px 4px #0001
+}
+.selected .choice-mark {
+  background:var(--green);
+  border-color:var(--green);
+  color:white
+}
+.selected .photo-wrap {
+  outline:3px solid var(--green);
+  outline-offset:-3px
+}
+.meal-copy {
+  display:block;
+  padding:14px 0 0
+}
+.meal-name {
+  display:block;
+  font:22px/1.18 Georgia,serif;
+  letter-spacing:-.4px;
+  text-transform:none
+}
+.meal-facts {
+  display:block;
+  color:var(--grey);
+  font-size:11px;
+  margin-top:7px
+}
+.image-placeholder {
+  height:100%;
+  display:grid;
+  place-items:center;
+  background:#e7e9df;
+  color:var(--grey);
+  font:italic 26px Georgia,serif
+}
+.image-failed .meal-image {
+  display:none
+}
+.image-failed::after {
+  content:'Photo unavailable';
+  display:grid;
+  place-items:center;
+  height:100%;
+  font-size:12px;
+  color:var(--grey)
+}
+.photo-credit {
+  display:inline-block;
+  color:var(--grey);
+  font-size:10px;
+  text-underline-offset:3px;
+  margin-top:7px
+}
+.choice-detail {
+  margin-top:20px;
+  padding:17px 20px;
+  background:var(--wash);
+  border-left:2px solid var(--green);
+  border-radius:0 3px 3px 0
+}
+.ingredients {
+  font-size:12px;
+  margin:0 0 14px;
+  color:#52614e
+}
+.ingredients strong {
+  font-weight:500;
+  color:var(--ink)
+}
+.field-label {
+  display:block;
+  font-size:12px;
+  font-weight:500;
+  margin-bottom:7px
+}
+.optional {
+  color:var(--grey);
+  font-weight:400;
+  margin-left:5px
+}
+textarea {
+  display:block;
+  resize:vertical;
+  width:100%;
+  min-height:74px;
+  border:1px solid #cbd2c3;
+  border-radius:3px;
+  background:#fffdf9;
+  color:var(--ink);
+  padding:11px 12px;
+  font-size:13px;
+  line-height:1.5
+}
+textarea::placeholder,input::placeholder {
+  color:#8a8e83
+}
+.choice-detail textarea {
+  min-height:62px
+}
+.unselected-hint {
+  font-size:12px;
+  color:var(--grey);
+  margin:15px 0 0
+}
+.extras-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:44px
+}
+.extras-section .section-heading {
+  margin-bottom:16px
+}
+.extras-section .section-heading h2 {
+  font-size:25px
+}
+.topup {
+  border-bottom:1px solid var(--rule);
+  padding:12px 0
+}
+.topup-toggle {
+  display:flex;
+  gap:12px;
+  align-items:center;
+  font-size:14px;
+  cursor:pointer
+}
+.topup-toggle input {
+  width:18px;
+  height:18px;
+  accent-color:var(--green);
+  margin:0
+}
+.topup-note {
+  margin:12px 0 0 30px
+}
+.topup-note textarea {
+  min-height:58px
+}
+.extra-field {
+  margin-top:20px
+}
+.snack-caption {
+  font-size:13px;
+  color:var(--grey);
+  margin:0 0 14px
+}
+.review {
+  margin-top:44px;
+  padding:25px 0;
+  border-top:1px solid var(--ink)
+}
+.review h2 {
+  font:27px Georgia,serif;
+  margin:0 0 18px
+}
+.review-list {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:24px
+}
+.review-list p {
+  margin:0;
+  font-size:13px
+}
+.review-list .review-label {
+  display:block;
+  font-size:10px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--grey);
+  margin-bottom:5px
+}
+.review-note {
+  color:var(--grey);
+  display:block;
+  font-size:12px;
+  margin-top:5px;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere
+}
+.review-extras {
+  margin-top:20px;
+  font-size:13px
+}
+.review-extras p {
+  margin:9px 0;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere
+}
+.export-help {
+  font-size:12px;
+  color:var(--grey);
+  max-width:75ch;
+  margin:20px 0 0
+}
+.plan-summary {
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#f8f6f0f5;
+  backdrop-filter:blur(16px);
+  border-top:1px solid var(--rule);
+  z-index:5
+}
+.summary-inner {
+  max-width:1120px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  padding:15px 0
+}
+.summary-title {
+  font-size:13px
+}
+.save-state {
+  display:block;
+  font-size:11px;
+  color:var(--grey);
+  margin-top:2px
+}
+.primary {
+  border:1px solid var(--green);
+  border-radius:3px;
+  padding:11px 20px;
+  background:var(--green);
+  color:#fff;
+  font-size:12px
+}
+.secondary {
+  border:1px solid var(--rule);
+  border-radius:3px;
+  padding:10px 16px;
+  background:none;
+  color:var(--ink);
+  font-size:12px
+}
+.export-actions {
+  display:flex;
+  align-items:center;
+  gap:12px
+}
+.export-path {
+  font-size:11px;
+  color:var(--grey);
+  overflow-wrap:anywhere
+}
+.export {
+  margin-top:26px;
+  padding-top:16px;
+  border-top:1px solid var(--rule)
+}
+.standfirst {
+  font-size:13px;
+  color:var(--grey);
+  margin:28px 0
+}
+.num {
+  font-variant-numeric:tabular-nums;
+  font-family:ui-monospace,monospace
+}
+ol {
+  list-style:none;
+  margin:0;
+  padding:0
+}
+li {
+  border-bottom:1px solid var(--rule);
+  padding:18px 0
+}
+li:first-child {
+  border-top:1px solid var(--rule)
+}
+.row {
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  align-items:baseline
+}
+.noun {
+  font:22px Georgia,serif
+}
+.amt {
+  font-size:12px;
+  color:var(--grey);
+  margin-top:3px
+}
+.flag {
+  font-size:12px;
+  color:var(--mark)
+}
+.flag.quiet {
+  color:var(--grey)
+}
+.ctl {
+  display:flex;
+  gap:16px;
+  margin-top:10px;
+  flex-wrap:wrap
+}
+.ctl a,.ctl button {
+  font:inherit;
+  font-size:11px;
+  color:var(--grey);
+  background:none;
+  border:0;
+  padding:3px 0;
+  cursor:pointer;
+  text-decoration:none
+}
+.ctl .on {
+  color:var(--ink);
+  text-decoration:underline;
+  text-underline-offset:4px
+}
+.qty {
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  color:var(--grey);
+  font-size:11px
+}
+.qty button {
+  border:1px solid var(--rule);
+  border-radius:2px;
+  width:25px;
+  height:25px;
+  padding:0
+}
+.opts {
+  margin-top:14px;
+  border-left:2px solid var(--rule);
+  padding-left:14px
+}
+.opt {
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:12px;
+  padding:6px 0;
+  font-size:12px
+}
+.opt .sz {
+  color:var(--grey)
+}
+.opt a {
+  font-size:11px;
+  text-underline-offset:3px
+}
+.add {
+  display:flex;
+  gap:8px;
+  margin-top:24px
+}
+.add input {
+  width:0;
+  flex:1;
+  font-size:14px;
+  padding:10px 12px;
+  border:1px solid var(--rule);
+  border-radius:3px;
+  background:#fffdf9;
+  color:var(--ink)
+}
+.add button {
+  font-size:12px;
+  padding:10px 20px;
+  border:0;
+  border-radius:3px;
+  background:var(--green);
+  color:white
+}
+.hint {
+  font-size:11px;
+  color:var(--grey);
+  margin-top:10px
+}
+.totals {
+  margin-top:30px;
+  border-top:1px solid var(--ink);
+  padding-top:12px
+}
+.trow {
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  padding:4px 0;
+  color:var(--grey)
+}
+.trow.sum {
+  color:var(--ink);
+  font-size:19px;
+  padding-top:12px;
+  margin-top:10px;
+  border-top:1px solid var(--rule)
+}
+footer {
+  font-size:11px;
+  color:var(--grey);
+  margin-top:24px;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap
+}
+.attn {
+  padding:14px 0;
+  border-block:1px solid var(--rule);
+  font-size:12px;
+  color:var(--grey)
+}
+.attn b {
+  display:block;
+  color:var(--ink);
+  margin-bottom:5px
+}
+.sep {
+  padding:0 7px
+}
+.empty {
+  padding:30px 0;
+  color:var(--grey)
+}
+.warn {
+  color:var(--mark)
+}
+@media(min-width:1500px) {
+  .sheet.plan-active,.summary-inner {
+    max-width:1200px
+  }
+  .meal-options {
+    gap:28px
+  }
+  .meal {
+    margin-bottom:50px
+  }
+}
+@media(max-width:1199px) {
+  .summary-inner {
+    margin:0 40px
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  html {
+    scroll-behavior:auto
+  }
+  .meal-image {
+    transition:none
+  }
+}
+@media(max-width:700px) {
+  body {
+    padding:0 20px 110px
+  }
+  header {
+    padding:23px 0 19px
+  }
+  h1 {
+    font-size:28px
+  }
+  .where {
+    font-size:10px
+  }
+  .plan-heading {
+    margin:32px 0;
+    display:block
+  }
+  .plan-heading h2 {
+    letter-spacing:-1.4px
+  }
+  .week-label {
+    display:none
+  }
+  .meal-options {
+    gap:14px;
+    grid-template-columns:repeat(3,minmax(0,1fr))
+  }
+  .meal-name {
+    font-size:18px
+  }
+  .meal-facts {
+    font-size:10px
+  }
+  .section-heading h2 {
+    font-size:25px
+  }
+  .section-caption {
+    font-size:10px
+  }
+  .extras-grid {
+    grid-template-columns:1fr;
+    gap:32px
+  }
+  .summary-inner {
+    margin:0 20px;
+    padding:12px 0
+  }
+  .primary {
+    padding:11px 13px
+  }
+  .review-list {
+    gap:15px
+  }
+  .choice-mark {
+    width:21px;
+    height:21px;
+    top:8px;
+    right:8px
+  }
+  .photo-credit {
+    font-size:9px
+  }
+}
+@media(max-width:460px) {
+  .meal-options {
+    grid-template-columns:1fr;
+    gap:18px
+  }
+  .meal-option {
+    display:grid;
+    grid-template-columns:126px 1fr;
+    align-items:center;
+    gap:16px
+  }
+  .photo-wrap {
+    aspect-ratio:4/3
+  }
+  .meal-copy {
+    padding:0
+  }
+  .meal-name {
+    font-size:22px
+  }
+  .meal-facts {
+    font-size:11px
+  }
+  .photo-credit {
+    margin-top:3px;
+    margin-left:142px;
+    display:block
+  }
+  .meal-card {
+    position:relative
+  }
+  .meal-option.selected .meal-name {
+    color:var(--green)
+  }
+  .review-list {
+    grid-template-columns:1fr;
+    gap:16px
+  }
+  .review-list p {
+    display:block
+  }
+  .summary-title {
+    font-size:12px
+  }
+  .export-actions {
+    gap:8px
+  }
+  .secondary {
+    padding:9px 12px
+  }
+  .section-number {
+    margin-right:10px
+  }
+  .choice-detail {
+    padding:15px
+  }
+  .section-caption {
+    max-width:140px;
+    text-align:right
+  }
+}
+  .sr-only {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .where input {display:block;width:230px;max-width:38vw;text-align:right;background:transparent;border:0;border-bottom:1px solid var(--rule);padding:4px 0;color:var(--grey);font-size:11px;border-radius:0}
+  .where input:focus {color:var(--ink);border-bottom-color:var(--green)}
+  .reason {margin:0 0 14px;font-size:12px;color:var(--grey)}
+  .reason summary {cursor:pointer;width:fit-content}
+  .reason p {max-width:75ch;margin:7px 0 0}
+</style>
+</head>
+<body>
+<div class="sheet plan-active">
+
+  <header>
+    <div><h1><a href="#plan">Provisions</a></h1><div class="brand-note">Your weekly shop</div></div>
+    <div class="where" id="where"><label class="sr-only" for="store">Store</label><input id="store" data-setting="store" maxlength="300" placeholder="Your store" autocomplete="off"><label class="sr-only" for="fulfilment">Collection or delivery</label><input id="fulfilment" data-setting="fulfilment" maxlength="300" placeholder="Collection or delivery" autocomplete="off"></div>
+  </header>
+
+  <nav class="tabs" aria-label="Views">
+    <a href="#plan" id="tab-plan" aria-current="page">This week</a>
+    <a href="#articles" id="tab-articles">Grocery list</a>
+  </nav>
+  <p id="message" class="hint" role="status"></p>
+
+  <section id="plan-panel" aria-labelledby="tab-plan">
+    <div class="plan-heading"><div><p class="eyebrow" id="plan-week">Your weekly plan</p><h2>The week’s food.</h2><p class="plan-intro" id="plan-intro">Pick a meal for each part of the day, then add your swaps and extras.</p></div></div>
+    <div id="meals"></div>
+    <div class="extras-grid">
+      <section class="extras-section topups" aria-label="Household top-ups"><div class="section-heading"><h2>Top-ups</h2><span class="section-caption">Only what you need</span></div><div id="topups"></div><div class="extra-field"><label class="field-label" for="extra-household">Anything else for the house?</label><textarea id="extra-household" data-extra="household" maxlength="4000" placeholder="Bin bags, washing powder…"></textarea></div></section>
+      <section class="extras-section" aria-label="Snacks and extras"><div class="section-heading"><h2>Snacks &amp; extras</h2><span class="section-caption">Room for the little things</span></div><label class="field-label" for="extra-snacks">Snacks</label><textarea id="extra-snacks" data-extra="snacks" maxlength="4000" placeholder="Salt &amp; vinegar chips, a few mandarins…"></textarea><div class="extra-field"><label class="field-label" for="extra-other">Anything else?<span class="optional">Optional</span></label><textarea id="extra-other" data-extra="other" maxlength="4000" placeholder="Drinks, pantry staples, or a note for the shop…"></textarea></div></section>
+    </div>
+    <section class="review" id="review"><h2>Your week, at a glance.</h2><div id="review-content"></div><p class="export-help">Your choices, changes and extras go into one file for Hermes. The grocery list is the starting point; Hermes will update it to match.</p><div class="export-actions" style="margin-top:18px"><button class="primary" data-export>Download for Hermes</button><button class="secondary" id="copyjson" hidden>Copy JSON</button></div><p id="export-path" class="export-path" role="status"></p></section>
+    <div class="plan-summary"><div class="summary-inner"><div><span class="summary-title" id="plan-summary"></span><span class="save-state" id="save-state" role="status">Saved on this Mac</span></div><div class="export-actions"><a class="secondary" href="#review" id="review-link">Review</a><button class="primary" data-export>Download for Hermes</button></div></div></div>
+  </section>
+
+  <section id="articles-panel" aria-labelledby="tab-articles" hidden>
+  <p class="standfirst">Your current grocery list. Hermes prepares it for your store; optional Woolworths NZ pricing is chosen by unit price. Meal choices and notes will be applied by Hermes after export.</p>
+
+  <div class="attn" id="attn" hidden></div>
+
+  <ol id="list"></ol>
+  <div class="empty" id="empty" hidden>No items.</div>
+
+  <div class="add">
+    <input aria-label="Add a grocery item" id="noun" placeholder="apples, milk, bread, cheese…" autocomplete="off" spellcheck="false">
+    <button id="addbtn">Add</button>
+  </div>
+  <div class="hint">Name the item. Pin a product in its details to keep it.</div>
+
+  <div class="totals">
+    <div class="trow"><span id="subtotal-label">Groceries</span><span class="num" id="t-sub">—</span></div>
+    <div class="trow"><span>Pick up</span><span class="num" id="t-pick">—</span></div>
+    <div class="trow"><span>Bags</span><span class="num" id="t-bag">—</span></div>
+    <div class="trow sum"><span>Total</span><span class="num" id="t-tot">—</span></div>
+  </div>
+
+  <p class="hint" id="pricing-note" hidden></p>
+  <footer>
+    <span id="stamp">—</span>
+    <span><a href="#" id="refresh" style="color:inherit">refresh prices</a> · <a href="#" id="clearall" style="color:inherit">empty list</a></span>
+  </footer>
+  <div class="export"><button class="secondary" data-export>Download for Hermes</button><p class="hint">Includes your meal choices, notes and extras.</p></div>
+  </section>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const m = n => "$" + (n||0).toFixed(2);
+// Product names/brands come from the Woolworths API, so escape before injecting into HTML.
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => (
+  {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let DATA = null;
+let PLAN = {};
+let PROFILE = {};
+let SELECTION = {chosen:{}, topups:{}, notes:{}, topup_notes:{}, extras:{}};
+let EXPORTED = null;
+const STATIC = !!window.__PRELOAD__;   // true in the generated snapshot preview
+const openOpts = new Set();
+const entries = value => Array.isArray(value) ? value : [];
+const entryId = (entry, kind, index) => String(entry.id || `${kind}-${index + 1}`);
+
+async function api(path, body){
+  const r = await fetch(path, body ? {
+    method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)
+  } : undefined);
+  const j = await r.json();
+  if (!r.ok || j.error) throw new Error(j.error || `request failed (${r.status})`);
+  return j;
+}
+
+function render(){
+  const list = $("#list");
+  list.innerHTML = "";
+  $("#empty").hidden = (DATA.items||[]).length > 0;
+
+  const attn = DATA.attention || [];
+  const strip = $("#attn");
+  if (attn.length){
+    strip.hidden = false;
+    strip.innerHTML = `<b>Worth knowing</b>` + attn.map(a =>
+      `<span>${esc(a.item)} · ${esc(a.text)}</span>`).join('<span class="sep">/</span>');
+  } else { strip.hidden = true; }
+
+  (DATA.items||[]).forEach(it => {
+    const c = it.chosen;
+    const li = document.createElement("li");
+
+    const amount = it.unit === "kg" ? `${it.qty.toFixed(2)} kg` : `${it.qty} ×`;
+    // only exceptions get to say anything; specials and stock are quiet facts
+    const loud = (it.flags||[]).filter(f => ["no_match","unavailable","price_up","swapped"].includes(f.kind));
+    const quiet = (it.flags||[]).filter(f => ["low_stock"].includes(f.kind));
+    const flag = loud.length ? `<div class="flag">${esc(loud[0].text)}</div>`
+               : (quiet.length ? `<div class="flag quiet">${esc(quiet[0].text)}</div>` : "");
+
+    const chosenLine = c
+      ? `<div class="opt"><div><span class="nm">${esc(c.name)}</span> <span class="sz">${esc(c.size)} · ${esc(c.unit_str)}</span></div>
+           <div><span class="num">${esc(m(c.price))}</span></div></div>`
+      : `<div class="opt"><div class="warn">no product matched this noun</div></div>`;
+
+    li.innerHTML = `
+      <div class="row">
+        <div>
+          <div class="noun">${esc(it.label)}</div>
+          <div class="amt num">${esc(amount)}</div>
+        </div>
+        ${flag}
+      </div>
+      <div class="ctl">
+        <span class="qty">
+          <button data-q="-" data-id="${esc(it.id)}">−</button>
+          <span>${it.unit === "kg" ? "kg" : "qty"}</span>
+          <button data-q="+" data-id="${esc(it.id)}">+</button>
+        </span>
+        <button data-opts="${esc(it.id)}" class="${openOpts.has(it.id)?"on":""}">${openOpts.has(it.id)?"hide":"details"}</button>
+        ${it.pinned ? `<button data-unpin="${esc(it.id)}" class="on">pinned</button>` : ""}
+        <button data-del="${esc(it.id)}">remove</button>
+      </div>
+      <div class="opts" data-box="${esc(it.id)}" ${openOpts.has(it.id)?"":"hidden"}>
+        ${chosenLine}
+        ${(it.options||[]).filter(o => !c || o.sku !== c.sku).slice(0,4).map(o => `
+          <div class="opt">
+            <div><span class="nm">${esc(o.name)}</span> <span class="sz">${esc(o.size)} · ${esc(o.unit_str)}${o.special?" · special":""}</span></div>
+            <div><span class="num">${esc(m(o.price))}</span> &nbsp;<a href="#" data-pin="${esc(it.id)}" data-sku="${esc(o.sku)}">use</a></div>
+          </div>`).join("")}
+      </div>`;
+    list.appendChild(li);
+  });
+
+  $("#t-sub").textContent  = m(DATA.subtotal);
+  $("#t-pick").textContent = m(DATA.pickup_fee);
+  $("#t-bag").textContent  = m(DATA.bag_fee);
+  const unpriced = (DATA.items||[]).filter(item => !item.chosen).length;
+  $("#t-tot").textContent = unpriced ? "—" : m(DATA.total);
+  $("#subtotal-label").textContent = unpriced ? "Priced groceries" : "Groceries";
+  $("#pricing-note").hidden = !unpriced;
+  $("#pricing-note").textContent = `${unpriced} ${unpriced === 1 ? "item needs" : "items need"} a price before the total is complete.`;
+  $("#refresh").textContent = PROFILE.catalogue === "woolworths-nz" ? "refresh prices" : "refresh list";
+  $("#stamp").textContent  = `${(DATA.items||[]).length} articles · list updated ${DATA.updated ? DATA.updated.replace("T"," ") : "—"}`;
+  renderPlan();
+  showTab();
+}
+
+const safeURL = value => { if(!value || typeof value !== "string") return ""; try { const u = new URL(value, location.href); return ["http:", "https:"].includes(u.protocol) ? u.href : ""; } catch { return ""; } };
+function noteFor(sid, oid){ return (SELECTION.notes[sid] || {})[oid] || ""; }
+function renderPlan(){
+  const slots = entries(PLAN.slots);
+  $("#plan-intro").textContent = PLAN.plan_missing ? "No meal plan yet. Import a plan to get started." : "Pick a meal for each part of the day, then add your swaps and extras.";
+  if (PLAN.week_of && /^\d{4}-\d{2}-\d{2}$/.test(PLAN.week_of)) {
+    const date = new Date(PLAN.week_of + "T12:00:00");
+    $("#plan-week").textContent = "Week of " + date.toLocaleDateString("en-NZ", {day:"numeric",month:"long"});
+  }
+  $("#meals").innerHTML = slots.map((slot, si) => {
+    const sid = entryId(slot, "slot", si), options = entries(slot.options);
+    const selected = options.find((o, oi) => SELECTION.chosen[sid] === entryId(o, "option", oi));
+    const oid = SELECTION.chosen[sid];
+    return `<section class="meal" aria-labelledby="meal-${si}"><div class="section-heading"><h2 id="meal-${si}"><span class="section-number">0${si+1}</span>${esc(slot.title || slot.id || "Meal")}</h2><span class="section-caption">${selected ? "✓ Chosen" : "Pick one"}</span></div>
+      <div class="meal-options">${options.map((option, oi) => {
+        const id = entryId(option, "option", oi), on = oid === id;
+        const image = safeURL(option.image), source = safeURL(option.image_source);
+        // Never use catalogue pack shots as meal photography, even in older imported plans.
+        const photo = image && !/woolworths|countdown/i.test(image) ? image : "";
+        return `<div class="meal-card"><button type="button" class="meal-option ${on ? "selected" : ""}" data-slot="${esc(sid)}" data-option="${esc(id)}" aria-pressed="${on}"><div class="photo-wrap">${photo ? `<img class="meal-image" src="${esc(photo)}" alt="${esc(option.name)}" loading="lazy" referrerpolicy="no-referrer">` : `<span class="image-placeholder" aria-hidden="true">${option.serves === 0 ? "Just coffee." : "At the table."}</span>`}<span class="choice-mark" aria-hidden="true">✓</span></div><span class="meal-copy"><strong class="meal-name">${esc(option.name || "Meal option")}</strong><span class="meal-facts">${esc(option.summary || (option.serves ? `${option.serves} portions` : "No breakfast groceries"))}</span></span></button>${source && photo ? `<a class="photo-credit" href="${esc(source)}" target="_blank" rel="noopener noreferrer">Photo: ${esc(option.image_credit || "View source")} ↗</a>` : ""}</div>`;
+      }).join("")}</div>
+      ${selected ? `<div class="choice-detail">${selected.reason ? `<details class="reason"><summary>Why this meal?</summary><p>${esc(selected.reason)}</p></details>` : ""}<p class="ingredients"><strong>Ingredients</strong> · ${esc(entries(selected.items).map(i => i.label || i.noun || "").filter(Boolean).join(", ") || "Nothing to add")}</p><label class="field-label" for="note-${si}">Make it yours<span class="optional">Preferences from Hermes · edit or clear anything</span></label><textarea id="note-${si}" data-note-slot="${esc(sid)}" data-note-option="${esc(oid)}" maxlength="4000" placeholder="Swap an ingredient, adjust portions, or add something…">${esc(noteFor(sid,oid))}</textarea></div>` : ""}</section>`;
+  }).join("");
+  $("#topups").innerHTML = entries(PLAN.topups).map((topup, ti) => {
+    const tid = entryId(topup, "topup", ti), on = SELECTION.topups[tid] === true;
+    return `<div class="topup"><label class="topup-toggle"><input type="checkbox" data-topup="${esc(tid)}" ${on ? "checked" : ""}><span>${esc(topup.name || "Top-up")}</span></label>${topup.reason ? `<details class="reason" style="margin:8px 0 0 30px"><summary>Why this?</summary><p>${esc(topup.reason)}</p></details>` : ""}${on ? `<div class="topup-note"><label class="field-label" for="topup-note-${ti}">Preferences<span class="optional">Edit or clear anything</span></label><textarea id="topup-note-${ti}" data-topup-note="${esc(tid)}" maxlength="4000" placeholder="Type, size, or quantity…">${esc(SELECTION.topup_notes[tid] || "")}</textarea></div>` : ""}</div>`;
+  }).join("");
+  for (const field of document.querySelectorAll("[data-extra]")) field.value = SELECTION.extras[field.dataset.extra] || "";
+  document.querySelectorAll(".meal-image").forEach(img => img.addEventListener("error", () => img.parentElement.classList.add("image-failed")));
+  if (STATIC) {
+    document.querySelectorAll("textarea, .topup-toggle input").forEach(field => field.disabled = true);
+    $("#save-state").textContent = "Preview only · open the live site to make changes";
+  }
+  renderReview();
+}
+function renderReview(){
+  const slots = entries(PLAN.slots);
+  let count = 0;
+  const meals = slots.map((slot, si) => {
+    const sid = entryId(slot, "slot", si), oid = SELECTION.chosen[sid];
+    const option = entries(slot.options).find((o,oi) => entryId(o,"option",oi) === oid);
+    if(option) count++;
+    return `<p><span class="review-label">${esc(slot.title || sid)}</span>${esc(option ? option.name : "Not chosen yet")}${option && noteFor(sid,oid) ? `<span class="review-note">${esc(noteFor(sid,oid))}</span>` : ""}</p>`;
+  }).join("");
+  const included = entries(PLAN.topups).map((t,i) => ({...t,key:entryId(t,"topup",i)})).filter(t => SELECTION.topups[t.key] === true);
+  const extras = included.map(t => `<p><strong>${esc(t.name)}</strong>${SELECTION.topup_notes[t.key] ? ` · ${esc(SELECTION.topup_notes[t.key])}` : ""}</p>`).join("") + Object.entries(SELECTION.extras).filter(([k,v]) => v.trim()).map(([k,v]) => `<p><strong>${esc({snacks:"Snacks",household:"Household",other:"Other"}[k] || k)}</strong> · ${esc(v)}</p>`).join("");
+  $("#review-content").innerHTML = `<div class="review-list">${meals}</div>${extras ? `<div class="review-extras">${extras}</div>` : ""}`;
+  $("#plan-summary").textContent = `${count} of ${slots.length} meals chosen${included.length ? ` · ${included.length} ${included.length === 1 ? "top-up" : "top-ups"}` : ""}`;
+}
+const pending = new Map();
+let saving = null, saveTimer;
+function saveStatus(text){ if(!STATIC) $("#save-state").textContent = text; }
+function queueSelection(key, body){
+  EXPORTED = null; $("#copyjson").hidden = true; $("#export-path").textContent = "";
+  pending.set(key,{path:"/api/selection",body}); saveStatus("Saving…");
+  clearTimeout(saveTimer); saveTimer = setTimeout(() => flushSelections().catch(showError),400);
+}
+function showError(err){ $("#message").textContent = err.message; saveStatus("Couldn't save · retry by downloading"); }
+async function flushSelections(){
+  clearTimeout(saveTimer);
+  if(saving) { await saving; if(pending.size) return flushSelections(); return; }
+  saving = (async () => {
+    while(pending.size){
+      const [key,request] = pending.entries().next().value; pending.delete(key);
+      try { await api(request.path,request.body); }
+      catch(err){ if(!pending.has(key)) pending.set(key,request); throw err; }
+    }
+    saveStatus("Saved on this Mac"); $("#message").textContent = "";
+  })();
+  try { await saving; } finally { saving = null; }
+}
+async function exportPlan(){
+  if(STATIC) { $("#message").textContent = "This is a preview. Open the live site to save or export."; return; }
+  const buttons = document.querySelectorAll("[data-export]"); buttons.forEach(b => b.disabled = true);
+  try {
+    await flushSelections();
+    const result = await api("/api/export",{}); EXPORTED = result.document;
+    const blob = new Blob([JSON.stringify(EXPORTED,null,2)+"\n"],{type:"application/json"});
+    const url = URL.createObjectURL(blob), link = document.createElement("a");
+    link.href=url; link.download=`provisions-${PLAN.week_of || "plan"}.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url),10000);
+    $("#export-path").textContent = `Downloaded for Hermes. A copy is saved at ${result.path}`;
+    $("#copyjson").hidden = false; saveStatus("Downloaded · ready for Hermes");
+  } finally { buttons.forEach(b => b.disabled = false); }
+}
+
+function showTab(){
+  if (!["#plan", "#articles", "#review"].includes(location.hash)) history.replaceState(null, "", "#plan");
+  const plan = location.hash !== "#articles";
+  $("#plan-panel").hidden = !plan;
+  $("#articles-panel").hidden = plan;
+  $(".sheet").classList.toggle("plan-active", plan);
+  for (const name of ["plan", "articles"]){
+    const link = $("#tab-" + name);
+    if ((name === "plan") === plan) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
+  }
+  for (const key of ["store", "fulfilment"]) {
+    const field = $("#"+key);
+    if(document.activeElement !== field) field.value = PROFILE[key] || "";
+    field.disabled = STATIC;
+  }
+}
+
+function wire(){
+  window.addEventListener("hashchange", showTab);
+  window.addEventListener("beforeunload", e => { if(pending.size || saving){ e.preventDefault(); e.returnValue = ""; } });
+  document.body.addEventListener("input", e => {
+    if(STATIC) return;
+    const t=e.target;
+    if(t.dataset.setting){
+      PROFILE[t.dataset.setting] = t.value;
+      queueSelection(`setting:${t.dataset.setting}`,{});
+      pending.set(`setting:${t.dataset.setting}`,{path:"/api/profile",body:{[t.dataset.setting]:t.value}});
+    } else if(t.dataset.noteSlot){
+      const sid=t.dataset.noteSlot, oid=t.dataset.noteOption;
+      (SELECTION.notes[sid] ||= {})[oid]=t.value;
+      queueSelection(`note:${sid}:${oid}`,{slot:sid,option:oid,note:t.value});
+    } else if(t.dataset.topupNote){
+      SELECTION.topup_notes[t.dataset.topupNote]=t.value;
+      queueSelection(`topup-note:${t.dataset.topupNote}`,{topup:t.dataset.topupNote,note:t.value});
+    } else if(t.dataset.extra){
+      SELECTION.extras[t.dataset.extra]=t.value;
+      queueSelection(`extra:${t.dataset.extra}`,{extra:t.dataset.extra,text:t.value});
+    }
+    renderReview();
+  });
+  document.body.addEventListener("change", e => {
+    const t=e.target;
+    if(STATIC || !t.dataset.topup) return;
+    SELECTION.topups[t.dataset.topup]=t.checked;
+    queueSelection(`topup:${t.dataset.topup}`,{topup:t.dataset.topup,on:t.checked});
+    renderPlan();
+  });
+  document.body.addEventListener("click", async e => {
+    try {
+      const t = e.target;
+      const card = t.closest("[data-option]");
+      if (card){
+        if (STATIC) return;
+        SELECTION.chosen[card.dataset.slot] = card.dataset.option;
+        queueSelection(`choice:${card.dataset.slot}`,{slot:card.dataset.slot,option:card.dataset.option});
+        const sid = card.dataset.slot, oid = card.dataset.option;
+        renderPlan();
+        const selected = Array.from(document.querySelectorAll("[data-option]")).find(el => el.dataset.slot === sid && el.dataset.option === oid);
+        if(selected) selected.focus({preventScroll:true});
+        return;
+      }
+      if (t.closest("[data-export]")){ await exportPlan(); return; }
+      if (t.id === "copyjson"){
+        if (STATIC || !EXPORTED) return;
+        await navigator.clipboard.writeText(JSON.stringify(EXPORTED, null, 2));
+        $("#message").textContent = "JSON copied.";
+        return;
+      }
+      const step = t.dataset.q;
+      if (step){
+        if (STATIC) return;
+        const it = DATA.items.find(i => i.id === t.dataset.id);
+        const inc = it.unit === "kg" ? 0.25 : 0.5;
+        const q = Math.max(it.unit === "kg" ? 0.25 : 1, it.qty + (step === "+" ? inc : -inc));
+        DATA = await api("/api/qty", {id: it.id, qty: q}); render(); return;
+      }
+      if (t.dataset.opts){
+        const id = t.dataset.opts;
+        openOpts.has(id) ? openOpts.delete(id) : openOpts.add(id);
+        render(); return;
+      }
+      if (t.dataset.pin){
+        e.preventDefault();
+        if (STATIC) return;
+        DATA = await api("/api/pin", {id: t.dataset.pin, sku: t.dataset.sku});
+        render(); return;
+      }
+      if (t.dataset.unpin){
+        if (STATIC) return;
+        DATA = await api("/api/pin", {id: t.dataset.unpin, sku: null});
+        render(); return;
+      }
+      if (t.dataset.del){
+        if (STATIC) return;
+        DATA = await api("/api/remove", {id: t.dataset.del}); render(); return;
+      }
+      if (t.id === "refresh"){
+        e.preventDefault();
+        if (STATIC){ $("#stamp").textContent = "static snapshot — run serve.py for live prices"; return; }
+        $("#stamp").textContent = "refreshing…";
+        DATA = await api("/api/list?refresh=1"); render(); return;
+      }
+      if (t.id === "clearall"){
+        e.preventDefault();
+        if (STATIC) return;
+        if (confirm("Empty the list?")){ DATA = await api("/api/clear", {}); render(); }
+        return;
+      }
+    } catch(err){ $("#message").textContent = err.message; }
+  });
+
+  async function add(){
+    const v = $("#noun").value.trim();
+    if (!v) return;
+    if (STATIC){ alert("Snapshot only. Start serve.py and open http://127.0.0.1:8770/"); return; }
+    $("#noun").value = "";
+    try { DATA = await api("/api/add", {noun: v}); render(); }
+    catch(err){ alert(err.message); }
+  }
+  $("#addbtn").addEventListener("click", add);
+  $("#noun").addEventListener("keydown", e => { if (e.key === "Enter") add(); });
+}
+
+(async function(){
+  try {
+    if (STATIC){
+      DATA = window.__PRELOAD__.list || window.__PRELOAD__;
+      PLAN = window.__PRELOAD__.plan || {};
+      PROFILE = window.__PRELOAD__.profile || {};
+      SELECTION = window.__PRELOAD__.selection || SELECTION;
+    } else {
+      [DATA, PLAN, SELECTION, PROFILE] = await Promise.all([api("/api/list?cached=1"), api("/api/plan"), api("/api/selection"), api("/api/profile")]);
+    }
+    SELECTION = {chosen:{},topups:{},notes:{},topup_notes:{},extras:{},...SELECTION};
+    render(); wire();
+  } catch(err){ $("#message").textContent = err.message; }
+})();
+</script>
+</body>
+</html>
