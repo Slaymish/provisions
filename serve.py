@@ -247,8 +247,9 @@ def handoff_text(plan, selection, profile):
         tid = entry_id(topup, "topup", ti)
         if selection.get("topups", {}).get(tid) is True:
             info = F.context("topup", "", tid, topup, selection, profile)
-            topups.append((topup.get("name") or "") +
-                          (" (" + info["current"] + ")" if info["current"] else ""))
+            # The name goes on the list line; the preference block below carries the text,
+            # so a top-up is not stated twice.
+            topups.append(topup.get("name") or "")
             edited_topups.append(info)
     lines.extend(["", "top-ups: " + (", ".join(topups) or "none")])
     for info in edited_topups:

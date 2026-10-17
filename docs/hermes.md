@@ -180,8 +180,8 @@ agent is expected to have no profile of its own, so the settled text always trav
 edit made in the app (an empty final text is `(cleared)`, and an empty suggestion
 omits `was:`), and an entry with no settled text and no edit has no line at all.
 
-Included top-ups follow as `name (note)`, or `top-ups: none`, with the same
-preference block beneath them. Non-empty snacks, household and other extras follow.
+Included top-ups follow as `name`, joined with commas, or `top-ups: none`, with the
+same preference block beneath each, so a top-up's text is never stated twice. Non-empty snacks, household and other extras follow.
 Edited meal options that were not chosen appear under `changed but not chosen:` with
 their keys and preference blocks, so a correction on a meal that lost the vote is
 still visible. The final instruction tells Hermes to rebuild the shop, to treat

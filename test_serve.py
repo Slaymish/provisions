@@ -309,7 +309,7 @@ class HandoffTextTests(unittest.TestCase):
                      'extras': {'snacks': 'Fruit  \nChips  ', 'household': '', 'other': 'Tea'}}
         text = serve.handoff_text(plan, selection, {'fulfilment': 'Pickup'})
         self.assertTrue(text.startswith('Provisions · week of 5 January 2026\nPickup\n\nmidday · not chosen\n'))
-        self.assertIn('\ntop-ups: Soap (Two bars), Toothpaste\n  now: Two bars\n  was: One bar\n'
+        self.assertIn('\ntop-ups: Soap, Toothpaste\n  now: Two bars\n  was: One bar\n'
                       'snacks: Fruit\nChips\nother: Tea\n', text)
         self.assertNotIn('household:', text)
         self.assertNotIn('Skipped', text)
