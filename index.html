@@ -52,11 +52,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   display:none!important
 }
 .sheet {
-  max-width:780px;
+  max-width:1120px;
   margin:auto
-}
-.sheet.plan-active {
-  max-width:1120px
 }
 header {
   display:flex;
@@ -87,30 +84,14 @@ h1 a {
   margin-top:9px;
   color:var(--grey)
 }
-.tabs {
-  display:flex;
-  gap:26px;
-  margin:0;
-  border-bottom:1px solid var(--rule)
-}
-.tabs a {
-  padding:17px 0 13px;
-  font-size:12px;
-  text-decoration:none;
-  color:var(--grey);
-  border-bottom:2px solid transparent;
-  margin-bottom:-1px
-}
-.tabs a[aria-current] {
-  color:var(--ink);
-  border-color:var(--ink)
-}
 #message:empty {
   display:none
 }
 #message {
   padding:12px 0;
-  color:var(--mark)
+  color:var(--mark);
+  white-space:pre-wrap;
+  overflow-wrap:anywhere
 }
 .plan-heading {
   display:flex;
@@ -470,186 +451,13 @@ textarea::placeholder,input::placeholder {
   color:var(--grey);
   overflow-wrap:anywhere
 }
-.export {
-  margin-top:26px;
-  padding-top:16px;
-  border-top:1px solid var(--rule)
-}
-.standfirst {
-  font-size:13px;
-  color:var(--grey);
-  margin:28px 0
-}
-.num {
-  font-variant-numeric:tabular-nums;
-  font-family:ui-monospace,monospace
-}
-ol {
-  list-style:none;
-  margin:0;
-  padding:0
-}
-li {
-  border-bottom:1px solid var(--rule);
-  padding:18px 0
-}
-li:first-child {
-  border-top:1px solid var(--rule)
-}
-.row {
-  display:grid;
-  grid-template-columns:1fr auto;
-  gap:10px;
-  align-items:baseline
-}
-.noun {
-  font:22px Georgia,serif
-}
-.amt {
-  font-size:12px;
-  color:var(--grey);
-  margin-top:3px
-}
-.flag {
-  font-size:12px;
-  color:var(--mark)
-}
-.flag.quiet {
-  color:var(--grey)
-}
-.ctl {
-  display:flex;
-  gap:16px;
-  margin-top:10px;
-  flex-wrap:wrap
-}
-.ctl a,.ctl button {
-  font:inherit;
-  font-size:11px;
-  color:var(--grey);
-  background:none;
-  border:0;
-  padding:3px 0;
-  cursor:pointer;
-  text-decoration:none
-}
-.ctl .on {
-  color:var(--ink);
-  text-decoration:underline;
-  text-underline-offset:4px
-}
-.qty {
-  display:inline-flex;
-  align-items:center;
-  gap:9px;
-  color:var(--grey);
-  font-size:11px
-}
-.qty button {
-  border:1px solid var(--rule);
-  border-radius:2px;
-  width:25px;
-  height:25px;
-  padding:0
-}
-.opts {
-  margin-top:14px;
-  border-left:2px solid var(--rule);
-  padding-left:14px
-}
-.opt {
-  display:grid;
-  grid-template-columns:1fr auto;
-  gap:12px;
-  padding:6px 0;
-  font-size:12px
-}
-.opt .sz {
-  color:var(--grey)
-}
-.opt a {
-  font-size:11px;
-  text-underline-offset:3px
-}
-.add {
-  display:flex;
-  gap:8px;
-  margin-top:24px
-}
-.add input {
-  width:0;
-  flex:1;
-  font-size:14px;
-  padding:10px 12px;
-  border:1px solid var(--rule);
-  border-radius:3px;
-  background:#fffdf9;
-  color:var(--ink)
-}
-.add button {
-  font-size:12px;
-  padding:10px 20px;
-  border:0;
-  border-radius:3px;
-  background:var(--green);
-  color:white
-}
 .hint {
   font-size:11px;
   color:var(--grey);
   margin-top:10px
 }
-.totals {
-  margin-top:30px;
-  border-top:1px solid var(--ink);
-  padding-top:12px
-}
-.trow {
-  display:flex;
-  justify-content:space-between;
-  font-size:13px;
-  padding:4px 0;
-  color:var(--grey)
-}
-.trow.sum {
-  color:var(--ink);
-  font-size:19px;
-  padding-top:12px;
-  margin-top:10px;
-  border-top:1px solid var(--rule)
-}
-footer {
-  font-size:11px;
-  color:var(--grey);
-  margin-top:24px;
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap
-}
-.attn {
-  padding:14px 0;
-  border-block:1px solid var(--rule);
-  font-size:12px;
-  color:var(--grey)
-}
-.attn b {
-  display:block;
-  color:var(--ink);
-  margin-bottom:5px
-}
-.sep {
-  padding:0 7px
-}
-.empty {
-  padding:30px 0;
-  color:var(--grey)
-}
-.warn {
-  color:var(--mark)
-}
 @media(min-width:1500px) {
-  .sheet.plan-active,.summary-inner {
+  .sheet,.summary-inner {
     max-width:1200px
   }
   .meal-options {
@@ -805,73 +613,36 @@ footer {
 </style>
 </head>
 <body>
-<div class="sheet plan-active">
+<div class="sheet">
 
   <header>
     <div><h1><a href="#plan">Provisions</a></h1><div class="brand-note">Your weekly shop</div></div>
     <div class="where" id="where"><label class="sr-only" for="store">Store</label><input id="store" data-setting="store" maxlength="300" placeholder="Your store" autocomplete="off"><label class="sr-only" for="fulfilment">Collection or delivery</label><input id="fulfilment" data-setting="fulfilment" maxlength="300" placeholder="Collection or delivery" autocomplete="off"></div>
   </header>
 
-  <nav class="tabs" aria-label="Views">
-    <a href="#plan" id="tab-plan" aria-current="page">This week</a>
-    <a href="#articles" id="tab-articles">Grocery list</a>
-  </nav>
   <p id="message" class="hint" role="status"></p>
 
-  <section id="plan-panel" aria-labelledby="tab-plan">
+  <section id="plan" aria-labelledby="plan-week">
     <div class="plan-heading"><div><p class="eyebrow" id="plan-week">Your weekly plan</p><h2>The week’s food.</h2><p class="plan-intro" id="plan-intro">Pick a meal for each part of the day, then add your swaps and extras.</p></div></div>
     <div id="meals"></div>
     <div class="extras-grid">
       <section class="extras-section topups" aria-label="Household top-ups"><div class="section-heading"><h2>Top-ups</h2><span class="section-caption">Only what you need</span></div><div id="topups"></div><div class="extra-field"><label class="field-label" for="extra-household">Anything else for the house?</label><textarea id="extra-household" data-extra="household" maxlength="4000" placeholder="Bin bags, washing powder…"></textarea></div></section>
       <section class="extras-section" aria-label="Snacks and extras"><div class="section-heading"><h2>Snacks &amp; extras</h2><span class="section-caption">Room for the little things</span></div><label class="field-label" for="extra-snacks">Snacks</label><textarea id="extra-snacks" data-extra="snacks" maxlength="4000" placeholder="Salt &amp; vinegar chips, a few mandarins…"></textarea><div class="extra-field"><label class="field-label" for="extra-other">Anything else?<span class="optional">Optional</span></label><textarea id="extra-other" data-extra="other" maxlength="4000" placeholder="Drinks, pantry staples, or a note for the shop…"></textarea></div></section>
     </div>
-    <section class="review" id="review"><h2>Your week, at a glance.</h2><div id="review-content"></div><p class="export-help">Your choices, changes and extras go into one file for Hermes. The grocery list is the starting point; Hermes will update it to match.</p><div class="export-actions" style="margin-top:18px"><button class="primary" data-export>Download for Hermes</button><button class="secondary" id="copyjson" hidden>Copy JSON</button></div><p id="export-path" class="export-path" role="status"></p></section>
-    <div class="plan-summary"><div class="summary-inner"><div><span class="summary-title" id="plan-summary"></span><span class="save-state" id="save-state" role="status">Saved on this Mac</span></div><div class="export-actions"><a class="secondary" href="#review" id="review-link">Review</a><button class="primary" data-export>Download for Hermes</button></div></div></div>
-  </section>
-
-  <section id="articles-panel" aria-labelledby="tab-articles" hidden>
-  <p class="standfirst">Your current grocery list. Hermes prepares it for your store; optional Woolworths NZ pricing is chosen by unit price. Meal choices and notes will be applied by Hermes after export.</p>
-
-  <div class="attn" id="attn" hidden></div>
-
-  <ol id="list"></ol>
-  <div class="empty" id="empty" hidden>No items.</div>
-
-  <div class="add">
-    <input aria-label="Add a grocery item" id="noun" placeholder="apples, milk, bread, cheese…" autocomplete="off" spellcheck="false">
-    <button id="addbtn">Add</button>
-  </div>
-  <div class="hint">Name the item. Pin a product in its details to keep it.</div>
-
-  <div class="totals">
-    <div class="trow"><span id="subtotal-label">Groceries</span><span class="num" id="t-sub">—</span></div>
-    <div class="trow"><span>Pick up</span><span class="num" id="t-pick">—</span></div>
-    <div class="trow"><span>Bags</span><span class="num" id="t-bag">—</span></div>
-    <div class="trow sum"><span>Total</span><span class="num" id="t-tot">—</span></div>
-  </div>
-
-  <p class="hint" id="pricing-note" hidden></p>
-  <footer>
-    <span id="stamp">—</span>
-    <span><a href="#" id="refresh" style="color:inherit">refresh prices</a> · <a href="#" id="clearall" style="color:inherit">empty list</a></span>
-  </footer>
-  <div class="export"><button class="secondary" data-export>Download for Hermes</button><p class="hint">Includes your meal choices, notes and extras.</p></div>
+    <section class="review" id="review"><h2>Your week, at a glance.</h2><div id="review-content"></div><p class="export-help">Copied text is what Hermes reads: your choices, your edits and your extras. It rebuilds the shop from them.</p><div class="export-actions" style="margin-top:18px"><button class="primary" data-handoff>Copy for Hermes</button><button class="secondary" data-export>Download JSON</button></div><p id="export-path" class="export-path" role="status"></p></section>
+    <div class="plan-summary"><div class="summary-inner"><div><span class="summary-title" id="plan-summary"></span><span class="save-state" id="save-state" role="status">Saved on this Mac</span></div><div class="export-actions"><a class="secondary" href="#review" id="review-link">Review</a><button class="primary" data-handoff>Copy for Hermes</button></div></div></div>
   </section>
 </div>
 
 <script>
 const $ = s => document.querySelector(s);
-const m = n => "$" + (n||0).toFixed(2);
-// Product names/brands come from the Woolworths API, so escape before injecting into HTML.
+// Escape authored text before injecting into HTML.
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => (
   {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-let DATA = null;
 let PLAN = {};
 let PROFILE = {};
 let SELECTION = {chosen:{}, topups:{}, notes:{}, topup_notes:{}, extras:{}};
-let EXPORTED = null;
 const STATIC = !!window.__PRELOAD__;   // true in the generated snapshot preview
-const openOpts = new Set();
 const entries = value => Array.isArray(value) ? value : [];
 const entryId = (entry, kind, index) => String(entry.id || `${kind}-${index + 1}`);
 
@@ -882,78 +653,6 @@ async function api(path, body){
   const j = await r.json();
   if (!r.ok || j.error) throw new Error(j.error || `request failed (${r.status})`);
   return j;
-}
-
-function render(){
-  const list = $("#list");
-  list.innerHTML = "";
-  $("#empty").hidden = (DATA.items||[]).length > 0;
-
-  const attn = DATA.attention || [];
-  const strip = $("#attn");
-  if (attn.length){
-    strip.hidden = false;
-    strip.innerHTML = `<b>Worth knowing</b>` + attn.map(a =>
-      `<span>${esc(a.item)} · ${esc(a.text)}</span>`).join('<span class="sep">/</span>');
-  } else { strip.hidden = true; }
-
-  (DATA.items||[]).forEach(it => {
-    const c = it.chosen;
-    const li = document.createElement("li");
-
-    const amount = it.unit === "kg" ? `${it.qty.toFixed(2)} kg` : `${it.qty} ×`;
-    // only exceptions get to say anything; specials and stock are quiet facts
-    const loud = (it.flags||[]).filter(f => ["no_match","unavailable","price_up","swapped"].includes(f.kind));
-    const quiet = (it.flags||[]).filter(f => ["low_stock"].includes(f.kind));
-    const flag = loud.length ? `<div class="flag">${esc(loud[0].text)}</div>`
-               : (quiet.length ? `<div class="flag quiet">${esc(quiet[0].text)}</div>` : "");
-
-    const chosenLine = c
-      ? `<div class="opt"><div><span class="nm">${esc(c.name)}</span> <span class="sz">${esc(c.size)} · ${esc(c.unit_str)}</span></div>
-           <div><span class="num">${esc(m(c.price))}</span></div></div>`
-      : `<div class="opt"><div class="warn">no product matched this noun</div></div>`;
-
-    li.innerHTML = `
-      <div class="row">
-        <div>
-          <div class="noun">${esc(it.label)}</div>
-          <div class="amt num">${esc(amount)}</div>
-        </div>
-        ${flag}
-      </div>
-      <div class="ctl">
-        <span class="qty">
-          <button data-q="-" data-id="${esc(it.id)}">−</button>
-          <span>${it.unit === "kg" ? "kg" : "qty"}</span>
-          <button data-q="+" data-id="${esc(it.id)}">+</button>
-        </span>
-        <button data-opts="${esc(it.id)}" class="${openOpts.has(it.id)?"on":""}">${openOpts.has(it.id)?"hide":"details"}</button>
-        ${it.pinned ? `<button data-unpin="${esc(it.id)}" class="on">pinned</button>` : ""}
-        <button data-del="${esc(it.id)}">remove</button>
-      </div>
-      <div class="opts" data-box="${esc(it.id)}" ${openOpts.has(it.id)?"":"hidden"}>
-        ${chosenLine}
-        ${(it.options||[]).filter(o => !c || o.sku !== c.sku).slice(0,4).map(o => `
-          <div class="opt">
-            <div><span class="nm">${esc(o.name)}</span> <span class="sz">${esc(o.size)} · ${esc(o.unit_str)}${o.special?" · special":""}</span></div>
-            <div><span class="num">${esc(m(o.price))}</span> &nbsp;<a href="#" data-pin="${esc(it.id)}" data-sku="${esc(o.sku)}">use</a></div>
-          </div>`).join("")}
-      </div>`;
-    list.appendChild(li);
-  });
-
-  $("#t-sub").textContent  = m(DATA.subtotal);
-  $("#t-pick").textContent = m(DATA.pickup_fee);
-  $("#t-bag").textContent  = m(DATA.bag_fee);
-  const unpriced = (DATA.items||[]).filter(item => !item.chosen).length;
-  $("#t-tot").textContent = unpriced ? "—" : m(DATA.total);
-  $("#subtotal-label").textContent = unpriced ? "Priced groceries" : "Groceries";
-  $("#pricing-note").hidden = !unpriced;
-  $("#pricing-note").textContent = `${unpriced} ${unpriced === 1 ? "item needs" : "items need"} a price before the total is complete.`;
-  $("#refresh").textContent = PROFILE.catalogue === "woolworths-nz" ? "refresh prices" : "refresh list";
-  $("#stamp").textContent  = `${(DATA.items||[]).length} articles · list updated ${DATA.updated ? DATA.updated.replace("T"," ") : "—"}`;
-  renderPlan();
-  showTab();
 }
 
 const safeURL = value => { if(!value || typeof value !== "string") return ""; try { const u = new URL(value, location.href); return ["http:", "https:"].includes(u.protocol) ? u.href : ""; } catch { return ""; } };
@@ -1009,11 +708,11 @@ const pending = new Map();
 let saving = null, saveTimer;
 function saveStatus(text){ if(!STATIC) $("#save-state").textContent = text; }
 function queueSelection(key, body){
-  EXPORTED = null; $("#copyjson").hidden = true; $("#export-path").textContent = "";
+  $("#export-path").textContent = "";
   pending.set(key,{path:"/api/selection",body}); saveStatus("Saving…");
   clearTimeout(saveTimer); saveTimer = setTimeout(() => flushSelections().catch(showError),400);
 }
-function showError(err){ $("#message").textContent = err.message; saveStatus("Couldn't save · retry by downloading"); }
+function showError(err){ $("#message").textContent = err.message; saveStatus("Couldn't save · try copying again"); }
 async function flushSelections(){
   clearTimeout(saveTimer);
   if(saving) { await saving; if(pending.size) return flushSelections(); return; }
@@ -1032,26 +731,38 @@ async function exportPlan(){
   const buttons = document.querySelectorAll("[data-export]"); buttons.forEach(b => b.disabled = true);
   try {
     await flushSelections();
-    const result = await api("/api/export",{}); EXPORTED = result.document;
-    const blob = new Blob([JSON.stringify(EXPORTED,null,2)+"\n"],{type:"application/json"});
+    const result = await api("/api/export",{});
+    const blob = new Blob([JSON.stringify(result.document,null,2)+"\n"],{type:"application/json"});
     const url = URL.createObjectURL(blob), link = document.createElement("a");
     link.href=url; link.download=`provisions-${PLAN.week_of || "plan"}.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url),10000);
     $("#export-path").textContent = `Downloaded for Hermes. A copy is saved at ${result.path}`;
-    $("#copyjson").hidden = false; saveStatus("Downloaded · ready for Hermes");
+    saveStatus("Downloaded · ready for Hermes");
   } finally { buttons.forEach(b => b.disabled = false); }
 }
 
-function showTab(){
-  if (!["#plan", "#articles", "#review"].includes(location.hash)) history.replaceState(null, "", "#plan");
-  const plan = location.hash !== "#articles";
-  $("#plan-panel").hidden = !plan;
-  $("#articles-panel").hidden = plan;
-  $(".sheet").classList.toggle("plan-active", plan);
-  for (const name of ["plan", "articles"]){
-    const link = $("#tab-" + name);
-    if ((name === "plan") === plan) link.setAttribute("aria-current", "page");
-    else link.removeAttribute("aria-current");
-  }
+async function copyHandoff(){
+  if(STATIC) { $("#message").textContent = "This is a preview. Open the live site to copy."; return; }
+  const buttons = document.querySelectorAll("[data-handoff]"); buttons.forEach(b => b.disabled = true);
+  try {
+    await flushSelections();
+    const {text} = await api("/api/handoff");
+    let copied = false;
+    try { await navigator.clipboard.writeText(text); copied = true; }
+    catch {
+      const field = document.createElement("textarea");
+      const focused = document.activeElement;
+      field.value = text;
+      field.style.cssText = "position:fixed;left:-9999px;top:0";
+      document.body.appendChild(field);
+      try { field.focus(); field.select(); copied = document.execCommand("copy"); }
+      catch { copied = false; }
+      finally { field.remove(); if(focused) focused.focus({preventScroll:true}); }
+    }
+    $("#message").textContent = copied ? "Copied — paste it into Hermes." : text;
+  } finally { buttons.forEach(b => b.disabled = false); }
+}
+
+function renderSettings(){
   for (const key of ["store", "fulfilment"]) {
     const field = $("#"+key);
     if(document.activeElement !== field) field.value = PROFILE[key] || "";
@@ -1060,7 +771,6 @@ function showTab(){
 }
 
 function wire(){
-  window.addEventListener("hashchange", showTab);
   window.addEventListener("beforeunload", e => { if(pending.size || saving){ e.preventDefault(); e.returnValue = ""; } });
   document.body.addEventListener("input", e => {
     if(STATIC) return;
@@ -1104,79 +814,22 @@ function wire(){
         return;
       }
       if (t.closest("[data-export]")){ await exportPlan(); return; }
-      if (t.id === "copyjson"){
-        if (STATIC || !EXPORTED) return;
-        await navigator.clipboard.writeText(JSON.stringify(EXPORTED, null, 2));
-        $("#message").textContent = "JSON copied.";
-        return;
-      }
-      const step = t.dataset.q;
-      if (step){
-        if (STATIC) return;
-        const it = DATA.items.find(i => i.id === t.dataset.id);
-        const inc = it.unit === "kg" ? 0.25 : 0.5;
-        const q = Math.max(it.unit === "kg" ? 0.25 : 1, it.qty + (step === "+" ? inc : -inc));
-        DATA = await api("/api/qty", {id: it.id, qty: q}); render(); return;
-      }
-      if (t.dataset.opts){
-        const id = t.dataset.opts;
-        openOpts.has(id) ? openOpts.delete(id) : openOpts.add(id);
-        render(); return;
-      }
-      if (t.dataset.pin){
-        e.preventDefault();
-        if (STATIC) return;
-        DATA = await api("/api/pin", {id: t.dataset.pin, sku: t.dataset.sku});
-        render(); return;
-      }
-      if (t.dataset.unpin){
-        if (STATIC) return;
-        DATA = await api("/api/pin", {id: t.dataset.unpin, sku: null});
-        render(); return;
-      }
-      if (t.dataset.del){
-        if (STATIC) return;
-        DATA = await api("/api/remove", {id: t.dataset.del}); render(); return;
-      }
-      if (t.id === "refresh"){
-        e.preventDefault();
-        if (STATIC){ $("#stamp").textContent = "static snapshot — run serve.py for live prices"; return; }
-        $("#stamp").textContent = "refreshing…";
-        DATA = await api("/api/list?refresh=1"); render(); return;
-      }
-      if (t.id === "clearall"){
-        e.preventDefault();
-        if (STATIC) return;
-        if (confirm("Empty the list?")){ DATA = await api("/api/clear", {}); render(); }
-        return;
-      }
+      if (t.closest("[data-handoff]")){ await copyHandoff(); return; }
     } catch(err){ $("#message").textContent = err.message; }
   });
-
-  async function add(){
-    const v = $("#noun").value.trim();
-    if (!v) return;
-    if (STATIC){ alert("Snapshot only. Start serve.py and open http://127.0.0.1:8770/"); return; }
-    $("#noun").value = "";
-    try { DATA = await api("/api/add", {noun: v}); render(); }
-    catch(err){ alert(err.message); }
-  }
-  $("#addbtn").addEventListener("click", add);
-  $("#noun").addEventListener("keydown", e => { if (e.key === "Enter") add(); });
 }
 
 (async function(){
   try {
     if (STATIC){
-      DATA = window.__PRELOAD__.list || window.__PRELOAD__;
       PLAN = window.__PRELOAD__.plan || {};
       PROFILE = window.__PRELOAD__.profile || {};
       SELECTION = window.__PRELOAD__.selection || SELECTION;
     } else {
-      [DATA, PLAN, SELECTION, PROFILE] = await Promise.all([api("/api/list?cached=1"), api("/api/plan"), api("/api/selection"), api("/api/profile")]);
+      [PLAN, SELECTION, PROFILE] = await Promise.all([api("/api/plan"), api("/api/selection"), api("/api/profile")]);
     }
     SELECTION = {chosen:{},topups:{},notes:{},topup_notes:{},extras:{},...SELECTION};
-    render(); wire();
+    renderPlan(); renderSettings(); wire();
   } catch(err){ $("#message").textContent = err.message; }
 })();
 </script>

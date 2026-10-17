@@ -2,7 +2,8 @@
 
 The interface is shared code; each person supplies a private profile and plan.
 No API key or Hermes installation is required to run the interface. Hermes (or
-another local agent) supplies the judgement and personalization through JSON.
+another local agent) supplies the judgement and personalization through plans
+and the weekly paste.
 
 ## Setup
 
@@ -37,8 +38,8 @@ A starting request:
 > Use Provisions in this checkout to plan my food for the week. Read my local
 > profile, use what you know about my schedule and preferences, and ask about
 > important gaps. Prefill meal and top-up preferences, include recipe photos and
-> short reasons, and import the plan. When I give you the export, learn my edits
-> and update the grocery proposal.
+> short reasons, and import the plan. When I paste my choices back, learn my
+> edits and build the shop from them.
 
 ## Private files
 
@@ -70,7 +71,8 @@ python3 agent.py learn /private/path/provisions-export.json
 ```
 
 `context` returns the profile, plan and effective selections. `export` returns
-`path` and `document`. A user can instead click **Download for Hermes**.
+`path` and `document`. **Download JSON** provides the same document;
+**Copy for Hermes** is the primary handoff.
 
 Profile updates merge these fields: `store`, `fulfilment`, `catalogue`, `fees`,
 `preferences`, `resolver_rules`. An empty preference string is meaningful.
@@ -81,8 +83,8 @@ for that stable key. Do not modify `preference_overrides` directly.
 named shop. `woolworths-nz` enables the existing Woolworths NZ search resolver.
 Changing the store text is not a store-specific availability check and does not
 switch adapters. Pickup fees and bag fees are supplied locally, never assumed.
-Startup, snapshots and exports use saved resolutions without querying the catalogue.
-Use the grocery list’s refresh control for new Woolworths prices.
+The app has no grocery list view. The agent builds the shop and can use
+`GET /api/list?refresh=1` for new Woolworths prices when asked to price it.
 The current resolver does not verify store-specific stock, pickup slots or checkout.
 
 For Woolworths, `resolver_rules` maps nouns to objects containing `query`,
@@ -129,8 +131,8 @@ The frontend prefills notes via `GET /api/selection`. It saves human changes wit
 
 An empty `note` is an explicit clear, not permission to use a default again.
 The export retains the usual chosen meals, all top-ups and their include/skip
-states, extras, current articles and totals. Each chosen meal and top-up carries
-`note` plus `preference` with the stable key, suggestion, final text and edited
+states and extras. It has no `articles` or `totals` keys. Each chosen meal and
+top-up carries `note` plus `preference` with the stable key, suggestion, final text and edited
 state. Top-level `preference_feedback` also includes corrections from unchosen
 meals and earlier plan entries so they cannot disappear just because the meal
 wasn't selected this week.
@@ -145,7 +147,7 @@ Example feedback:
   "previous": "Light milk, high protein",
   "text": "Light milk",
   "change": "edited",
-  "edited_at": "2026-01-01T00:00:00+00:00"
+  "edited_at": "<UTC timestamp>"
 }
 ```
 
@@ -157,7 +159,7 @@ stated otherwise. Clarify contradictions with safety-critical constraints.
 After processing the export, run `agent.py learn` with that exact file. This
 folds final text into `profile.preferences` and acknowledges the matching edit
 IDs. It is safe to repeat. An older export cannot erase a newer human edit.
-Learning changes preferences, not purchases or the current grocery list.
+Learning changes preferences, not purchases or agent pricing state.
 Keep other agent memories consistent with these explicit corrections, without
 copying the person's private history into the public checkout.
 
@@ -165,31 +167,44 @@ The app stores only the latest pending correction per key. The suggestion and
 final text remain in feedback even if autosave captured several interim edits.
 Acknowledged edits remain in the user's saved export files.
 
-## Grocery proposal
+## Clipboard handoff
 
-`agent.py articles` replaces the proposal with an `{"items": [...]}` document.
-Every article requires `noun`, optional stable `id`/`label`, positive `qty`
-(default 1) and `unit` (`ea` or `kg`). See `examples/articles.example.json`.
-Existing product resolutions are retained for matching IDs unless `chosen` is
-provided. To replace a resolution, `chosen` is `null` or an object containing
-`name`, `price`, `unit_price`, optional `sku`, `size`, `unit_str`.
-Unit prices for `kg` articles must be per kilogram. Agent-supplied prices are
-proposals, not live validated quotes. Do not claim a total is complete when
-some items remain unpriced.
+`GET /api/handoff` returns `{"text": "...", "week_of": "..."}`. `week_of` is the
+plan’s date or an empty string. The text starts with the week, store and fulfilment,
+then lists every slot in plan order with its choice (or `not chosen`) and any
+explicit preference key. Edited preferences have two-space-indented `now:` and
+`was:` lines. Empty final text is `(cleared)`; empty suggestions omit `was:`.
+Untouched preferences have no edit lines.
 
-Reconcile meal ingredient notes before sending this proposal. Only include top-ups
-with `on: true`, apply their final notes and add requested extras. The export's
-`articles` and `totals` describe the existing proposal, not a recalculation from
-new meal choices. Checkout is outside this workflow.
+Included top-ups follow as `name (note)`, or `top-ups: none`, with any edit lines
+beneath them. Non-empty snacks, household and other extras follow. Edited meal
+options that were not chosen appear under `changed but not chosen:` with their
+keys and edit lines. The final instruction tells Hermes to rebuild the shop and
+learn final text without restoring removed preferences. The paste ends in one
+newline. A valid plain `YYYY-MM-DD` week is shown with an English month name.
+
+The app is the person’s input view and has no list view. Read the paste, apply
+final preferences and build the shop yourself. If durable local acknowledgement
+is needed, obtain the JSON export and use `agent.py learn` with its exact feedback
+IDs; the paste does not contain acknowledgement IDs.
+
+The grocery APIs remain an agent price tool. `agent.py articles` accepts
+`{"items": [...]}` with `noun`, optional `id`/`label`, positive `qty` (default 1),
+and `unit` (`ea` or `kg`). Optional `chosen` supplies a product resolution with
+`name`, `price`, `unit_price` and optional `sku`, `size`, `unit_str`; `null` clears
+it. Omitted resolutions are retained for matching IDs. See
+`examples/articles.example.json`. Agent prices are proposals, and kilogram unit
+prices must be per kilogram. Checkout remains a separate user action.
 
 ## HTTP equivalents
 
-- `GET /api/profile`, `/api/plan`, `/api/selection`, `/api/list`
+- `GET /api/profile`, `/api/plan`, `/api/selection`, `/api/handoff`
+- `GET /api/list`: agent pricing tool; `?cached=1` uses saved prices, `?refresh=1` refreshes
 - `POST /api/profile`: merge allowed settings and preference suggestions
 - `POST /api/import`: import a validated plan
 - `POST /api/selection`: save a meal choice, note, top-up or extra
 - `POST /api/articles/import`: replace the grocery proposal
-- `POST /api/export`: save and return the handoff
+- `POST /api/export`: save and return the JSON learning document
 - `POST /api/learn`: acknowledge feedback from the full export document
 
 Requests use `Content-Type: application/json`. The server binds to loopback

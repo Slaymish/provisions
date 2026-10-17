@@ -1,6 +1,6 @@
 # Provisions
 
-A quiet, brandless interface for your weekly food shop. Pick meals, adjust
+A quiet, brandless input view for your week’s food. Pick meals, adjust
 preferences, add the extras and give the plan back to your agent.
 
 Provisions keeps the choices about food in front of you. Product selection,
@@ -29,31 +29,29 @@ The app starts empty; the files under `examples/` demonstrate the format.
    include recipe photos, short reasons and prefilled preferences.
 2. You choose meals and edit the details. Notes stay with the right meal. Top-ups,
    snacks, household items and other requests have their own fields.
-3. Review and download one JSON file for Hermes. It includes both the suggestions
-   and your corrections, so removing a preference is recorded explicitly.
-4. Hermes updates the grocery proposal and learns your corrections for next time.
+3. Review the week and click **Copy for Hermes**. The text includes your choices,
+   edits and extras, including corrections on meals you did not choose.
+4. Paste it into Hermes. Hermes learns your corrections and builds the shop.
 
 For example, if a milk preference says “Light milk, high protein” and you remove
-“high protein”, the export records the before and after text. Once Hermes
+“high protein”, the paste records the before and after text. Once Hermes
 acknowledges it, “Light milk” becomes the local default. Clearing the field is
 remembered too. New suggestions cannot silently undo a pending correction.
 
 No LLM runs inside the app. The agent workflow uses ordinary JSON files and a
 local HTTP API; it also works with another agent that follows the same contract.
-Your agent must process the export for learning and list reconciliation to happen.
+The app has no grocery list view. Hermes builds the shop from the paste.
+**Download JSON** provides the full feedback IDs for durable local learning.
 
 ## Stores and pricing
 
-Every installation has its own editable store label, fulfilment details, fees and
-matching preferences. Startup and exports use saved prices, so planning works
-without a catalogue connection; refresh prices explicitly when needed. The default `agent` mode lets Hermes prepare a proposal for
-your shop. An optional `woolworths-nz` adapter searches Woolworths NZ and selects
-products by unit price, respecting local matching rules and product pins.
+Every installation has its own editable store and fulfilment details. Hermes
+selects products and prices the shop itself if asked. The local grocery APIs
+remain available as an agent price tool, including an optional `woolworths-nz`
+resolver with personal matching rules and product pins.
 
-A store label does not verify branch stock or pickup times. Other retailers do
-not have built-in live price adapters. Totals describe the existing grocery
-proposal; Hermes must reconcile meal edits before treating it as the next shop.
-Purchasing and checkout are not automated.
+A store label does not verify branch stock or pickup times. Other retailers have
+no built-in live price adapter. Purchasing and checkout are not automated.
 
 ## Personal data stays local
 
@@ -78,7 +76,7 @@ Tests use isolated temporary profiles and a stub catalogue. See
 
 | File | Purpose |
 | --- | --- |
-| `index.html` | Interface, autosave, review and JSON download |
+| `index.html` | Input view, autosave, review and clipboard handoff |
 | `serve.py` | Local HTTP API, plan validation and handoff |
 | `preferences.py` | Suggestions, explicit edits and durable learning |
 | `local_data.py` | Private storage and atomic JSON writes |

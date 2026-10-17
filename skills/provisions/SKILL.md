@@ -1,10 +1,11 @@
 ---
 name: provisions
-description: Prepare personal meal plans, maintain grocery preferences and process edited Provisions shopping exports for a local Provisions installation. Use when the user asks to plan meals or groceries with Provisions, or supplies a provisions.export.v1 file.
+description: Read Provisions handoff pastes, author personal meal plans and learn preference corrections for a local Provisions installation. Use when the user asks to plan meals or groceries with Provisions, or supplies a Provisions paste or provisions.export.v1 file.
 ---
 
-Provisions is a local interface for a person's weekly food and shopping choices.
-The app does not run an LLM. You author the plan and learn from their edits.
+Provisions is the person’s input view for the week. It has no grocery list view
+and runs no LLM. Read the paste, learn the edits and build the shop yourself;
+price it if asked. Author the next plan for the app.
 
 Locate the Provisions checkout and read `docs/hermes.md` there for the JSON
 contract and commands. Run `python3 agent.py context` from that checkout to read
@@ -20,7 +21,11 @@ preferences, and optionally provide concise `reason` text. Do not assume the
 example plan's milk preference applies to them. Prefer photos of the prepared
 dish from real recipe pages; include the image source and publisher credit.
 
-On receiving an export, treat `preference_feedback` as explicit corrections.
+The primary handoff is **Copy for Hermes** (`GET /api/handoff`). It lists choices,
+included top-ups, extras and edited unchosen options. Treat `now:` as final;
+`(cleared)` means empty text, and `was:` is what was edited away.
+
+On receiving a JSON export, treat `preference_feedback` as explicit corrections.
 A `text` of `""` is a deliberate clear. Use its `suggested`, `previous` and final
 `text` to understand what changed. Removed qualifiers must not return in future
 plans. A meal choice, skipped top-up or an empty untouched field alone is not a
@@ -28,9 +33,10 @@ new enduring preference. Treat extras as requests for this shop unless the perso
 says they are recurring. Never override allergy or other safety constraints based
 only on a missing word; clarify a material conflict.
 
-Reconcile the grocery proposal with chosen meals, notes and included top-ups.
-Use `agent.py articles` to replace the local proposal and `agent.py learn` to
-acknowledge the exact exported corrections after processing them. Learning is
+Build the shop from chosen meals, final notes, included top-ups and extras.
+The paste has no feedback IDs. Obtain **Download JSON** or `agent.py export`
+and use `agent.py learn` to acknowledge exact corrections locally. The JSON has
+no `articles` or `totals`; it retains `preference_feedback`. Learning is
 idempotent and ignores stale edits when the person has since changed the field.
 The private profile is the app's durable preference store. Respect newer edits.
 
@@ -38,5 +44,6 @@ Import the next plan with `agent.py import`. Put new inferences in profile
 `preferences` with `agent.py profile`; human edits take priority until learned.
 Do not edit `preference_overrides` manually. Shop labels do not change the live
 catalogue provider: only `woolworths-nz` has a built-in price adapter. For other
-shops use `agent` mode and research/propose products and prices yourself, stating
-when a price is an estimate. Purchases and checkout remain separate user actions.
+shops use `agent` mode and research products and prices yourself, stating
+when a price is an estimate. `agent.py articles` and `/api/list` remain agent
+price tools. Purchases and checkout remain separate user actions.

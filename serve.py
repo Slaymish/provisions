@@ -6,6 +6,8 @@ import sys
 import threading
 import time
 import math
+import re
+from datetime import date
 from local_data import atomic_json, save_profile
 import preferences as F
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -189,10 +191,80 @@ def save_note(kind, sid, oid, entry, text):
     save_profile(profile, P.STATE_DIR)
 
 
+def handoff_text(plan, selection, profile):
+    """Build the person's paste for Hermes without reading or changing state."""
+    header = "Provisions"
+    week = plan.get("week_of")
+    if isinstance(week, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", week):
+        try:
+            day = date.fromisoformat(week)
+        except ValueError:
+            pass
+        else:
+            months = ("January", "February", "March", "April", "May", "June",
+                      "July", "August", "September", "October", "November", "December")
+            header += " · week of %d %s %d" % (day.day, months[day.month - 1], day.year)
+    lines = [header]
+    shop = " · ".join(profile.get(key, "").strip() for key in ("store", "fulfilment")
+                      if profile.get(key, "").strip())
+    if shop:
+        lines.append(shop)
+    lines.append("")
+
+    def preference_lines(info):
+        if info["user_edited"]:
+            lines.append("  now: " + (info["current"] or "(cleared)"))
+            if info["suggested"]:
+                lines.append("  was: " + info["suggested"])
+
+    unchosen = []
+    for si, slot in enumerate(plan.get("slots") or []):
+        sid = entry_id(slot, "slot", si)
+        chosen = None
+        for oi, option in enumerate(slot.get("options") or []):
+            oid = entry_id(option, "option", oi)
+            info = F.context("meal", sid, oid, option, selection, profile)
+            if selection.get("chosen", {}).get(sid) == oid:
+                chosen = (option, info)
+            elif info["user_edited"]:
+                unchosen.append((option, info))
+        label = slot.get("title") or sid
+        if chosen is None:
+            lines.append(label + " · not chosen")
+        else:
+            option, info = chosen
+            key = option.get("preference_key")
+            lines.append(label + " · " + (option.get("name") or "") +
+                         (" [" + key + "]" if key else ""))
+            preference_lines(info)
+
+    topups, edited_topups = [], []
+    for ti, topup in enumerate(plan.get("topups") or []):
+        tid = entry_id(topup, "topup", ti)
+        if selection.get("topups", {}).get(tid) is True:
+            info = F.context("topup", "", tid, topup, selection, profile)
+            topups.append((topup.get("name") or "") +
+                          (" (" + info["current"] + ")" if info["current"] else ""))
+            edited_topups.append(info)
+    lines.extend(["", "top-ups: " + (", ".join(topups) or "none")])
+    for info in edited_topups:
+        preference_lines(info)
+    for key in ("snacks", "household", "other"):
+        text = selection.get("extras", {}).get(key, "")
+        if text.strip():
+            lines.append(key + ": " + text)
+    if unchosen:
+        lines.extend(["", "changed but not chosen:"])
+        for option, info in unchosen:
+            lines.append("  " + (option.get("name") or "") + " [" + info["key"] + "]")
+            preference_lines(info)
+    lines.extend(["", 'For Hermes: rebuild the shop from these choices. Anything after "now:" is my final preference — learn it and do not bring back what I removed.'])
+    return "\n".join(line.rstrip() for line in "\n".join(lines).splitlines()) + "\n"
+
+
 def export_document():
     plan = load_plan()
     selection = load_selection()
-    resolved = P.resolved_list(cached_only=True)
     profile = P.profile()
     chosen = {}
     for si, slot in enumerate(plan.get("slots") or []):
@@ -206,16 +278,6 @@ def export_document():
                                "note": selection["notes"].get(sid, {}).get(oid, ""),
                                "preference": preference_for("meal", sid, oid, option)}
                 break
-    articles = []
-    for item in resolved["items"]:
-        product = item.get("chosen") or {}
-        article = {key: item.get(key) for key in
-                   ("id", "noun", "label", "qty", "unit", "pinned", "line_total")}
-        article.update({"chosen_sku": product.get("sku"),
-                        "chosen_name": product.get("name"),
-                        "price": product.get("price"),
-                        "unit_price_str": product.get("unit_str")})
-        articles.append(article)
     return {
         "type": "provisions.export.v1",
         "exported_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
@@ -231,12 +293,7 @@ def export_document():
                     "preference": preference_for("topup", "", entry_id(topup, "topup", ti), topup)}
                    for ti, topup in enumerate(plan.get("topups") or [])],
         "extras": selection["extras"],
-        "instructions": "Apply meal notes as overrides to the listed ingredients. Include requested snacks and extras. Reconcile the existing articles with this plan before shopping; totals describe the existing list only. preference_feedback records explicit human edits, including cleared text: learn the final text and do not restore removed qualifiers. Acknowledge exact feedback IDs with /api/learn after processing.",
-        "articles": articles,
-        "totals": {**{key: resolved[key] for key in
-                   ("subtotal", "pickup_fee", "bag_fee", "total")},
-                   "complete": all(item.get("chosen") for item in resolved["items"]),
-                   "unpriced": sum(not item.get("chosen") for item in resolved["items"])},
+        "instructions": "Rebuild the shop from these choices. Treat each preference's current text as final; the suggested text is what was edited away.",
     }
 
 
@@ -280,11 +337,16 @@ class Handler(BaseHTTPRequestHandler):
                 return self._send(200, P.resolved_list(force=force, cached_only=parse_qs(u.query).get("cached") == ["1"]))
             except Exception as e:
                 return self._send(500, {"error": str(e)})
-        if u.path in ("/api/plan", "/api/selection", "/api/profile"):
+        if u.path in ("/api/plan", "/api/selection", "/api/profile", "/api/handoff"):
             try:
                 with PLAN_LOCK:
-                    document = (load_plan() if u.path == "/api/plan" else
-                                P.profile() if u.path == "/api/profile" else load_selection())
+                    if u.path == "/api/handoff":
+                        plan = load_plan()
+                        document = {"text": handoff_text(plan, load_selection(effective=False), P.profile()),
+                                    "week_of": plan.get("week_of") or ""}
+                    else:
+                        document = (load_plan() if u.path == "/api/plan" else
+                                    P.profile() if u.path == "/api/profile" else load_selection())
                 return self._send(200, document)
             except Exception as e:
                 return self._send(500, {"error": str(e)})

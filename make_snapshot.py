@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bake the current list into a self-contained snapshot.html for previewing offline."""
+"""Bake the current plan into a self-contained snapshot.html for previewing offline."""
 import json
 import os
 import sys
@@ -11,7 +11,7 @@ from serve import load_plan, load_selection
 
 
 def main():
-    data = {"list": P.resolved_list(cached_only=True), "plan": load_plan(), "selection": load_selection(), "profile": P.profile()}
+    data = {"plan": load_plan(), "selection": load_selection(), "profile": P.profile()}
     with open(os.path.join(HERE, "index.html")) as f:
         html = f.read()
     # Keep authored text from terminating the script element in a snapshot.

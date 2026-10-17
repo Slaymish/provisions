@@ -53,6 +53,60 @@ class SelectionTests(unittest.TestCase):
     def select(self, **body):
         return self.post('/api/selection', body)
 
+    def get(self, path):
+        with urllib.request.urlopen(self.base + path) as response:
+            return json.load(response)
+
+    def test_handoff_endpoint_chosen_plan(self):
+        self.assertEqual(self.get('/api/handoff')['week_of'], '')
+        self.plan['week_of'] = '2026-10-19'
+        serve.atomic_json(serve.PLAN_FILE, self.plan)
+        self.post('/api/profile', {'store': 'Synthetic store', 'fulfilment': 'Sunday pickup'})
+        self.select(slot='breakfast', option='eggs')
+        self.select(slot='slot-2', option='option-1')
+        result = self.get('/api/handoff')
+        self.assertEqual(result['week_of'], '2026-10-19')
+        self.assertEqual(result['text'], (
+            'Provisions · week of 19 October 2026\nSynthetic store · Sunday pickup\n\n'
+            'breakfast · Eggs on toast\nslot-2 · Lunch\n\ntop-ups: none\n\n'
+            'For Hermes: rebuild the shop from these choices. Anything after "now:" is my final preference — learn it and do not bring back what I removed.\n'))
+
+    def test_handoff_edited_cleared_and_untouched_preferences(self):
+        self.add_preferences()
+        self.select(slot='breakfast', option='eggs')
+        untouched = self.get('/api/handoff')['text']
+        self.assertIn('breakfast · Eggs on toast [meal:eggs-on-toast]\n', untouched)
+        self.assertNotIn('  now:', untouched)
+        self.assertNotIn('  was:', untouched)
+        self.select(slot='breakfast', option='eggs', note='Sourdough')
+        self.assertIn('  now: Sourdough\n  was: English muffins\n', self.get('/api/handoff')['text'])
+        self.select(slot='breakfast', option='eggs', note='')
+        self.assertIn('  now: (cleared)\n  was: English muffins\n', self.get('/api/handoff')['text'])
+        # A pending correction is authoritative even when it equals an empty suggestion.
+        self.post('/api/profile', {'preferences': {'meal:eggs-on-toast': ''}})
+        cleared = self.get('/api/handoff')['text']
+        self.assertIn('  now: (cleared)\n', cleared)
+        self.assertNotIn('  was:', cleared)
+
+    def test_handoff_keeps_edits_on_unchosen_options(self):
+        self.add_preferences()
+        self.select(slot='breakfast', option='eggs', note='Sourdough')
+        self.select(slot='breakfast', option='oats')
+        self.assertIn('\nchanged but not chosen:\n  Eggs on toast [meal:eggs-on-toast]\n'
+                      '  now: Sourdough\n  was: English muffins\n', self.get('/api/handoff')['text'])
+
+    def test_export_omits_shop_and_preserves_feedback(self):
+        self.add_preferences()
+        self.select(slot='breakfast', option='eggs', note='Sourdough')
+        feedback = list(serve.P.profile()['preference_overrides'].values())
+        exported = self.post('/api/export', {})['document']
+        self.assertNotIn('articles', exported)
+        self.assertNotIn('totals', exported)
+        self.assertEqual(exported['instructions'], "Rebuild the shop from these choices. Treat each preference's current text as final; the suggested text is what was edited away.")
+        self.assertEqual(exported['preference_feedback'], feedback)
+        self.assertEqual(set(feedback[0]), {'id', 'key', 'suggested', 'previous', 'text', 'change', 'edited_at'})
+        serve.P.resolved_list.assert_not_called()
+
     def test_notes_survive_switch_and_export_in_context(self):
         self.select(slot='breakfast', option='eggs')
         self.select(slot='breakfast', option='eggs', note='English muffins instead of bread')
@@ -203,6 +257,44 @@ class SelectionTests(unittest.TestCase):
             urllib.request.urlopen(req)
         self.assertEqual(ctx.exception.code, 403)
         self.assertEqual(serve.P.profile()['store'], '')
+
+
+class HandoffTextTests(unittest.TestCase):
+    def test_handoff_nine_edited_options_stays_compact(self):
+        plan = {'week_of': '2026-10-19', 'slots': []}
+        selection = {'chosen': {}, 'notes': {}}
+        for slot in ('breakfast', 'lunch', 'dinner'):
+            options = [{'id': str(i), 'name': slot + ' option ' + str(i),
+                        'preference_key': 'meal:%s-%s' % (slot, i),
+                        'preference': 'Rice and vegetables'} for i in range(3)]
+            plan['slots'].append({'id': slot, 'options': options})
+            selection['chosen'][slot] = '0'
+            selection['notes'][slot] = {str(i): 'Noodles and vegetables' for i in range(3)}
+        text = serve.handoff_text(plan, selection, {})
+        self.assertEqual(text.count('  now:'), 9)
+        self.assertEqual(text.count('  was:'), 9)
+        self.assertLess(len(text), 2000)
+
+    def test_handoff_headers_topups_extras_and_whitespace(self):
+        plan = {'week_of': '2026-01-05', 'slots': [{'id': 'lunch', 'title': 'midday',
+                 'options': []}], 'topups': [
+                     {'id': 'soap', 'name': 'Soap', 'preference': 'One bar'},
+                     {'id': 'paste', 'name': 'Toothpaste'}, {'id': 'skip', 'name': 'Skipped'}]}
+        selection = {'topups': {'soap': True, 'paste': True},
+                     'topup_notes': {'soap': 'Two bars'},
+                     'extras': {'snacks': 'Fruit  \nChips  ', 'household': '', 'other': 'Tea'}}
+        text = serve.handoff_text(plan, selection, {'fulfilment': 'Pickup'})
+        self.assertTrue(text.startswith('Provisions · week of 5 January 2026\nPickup\n\nmidday · not chosen\n'))
+        self.assertIn('\ntop-ups: Soap (Two bars), Toothpaste\n  now: Two bars\n  was: One bar\n'
+                      'snacks: Fruit\nChips\nother: Tea\n', text)
+        self.assertNotIn('household:', text)
+        self.assertNotIn('Skipped', text)
+        self.assertTrue(text.endswith('\n'))
+        self.assertFalse(text.endswith('\n\n'))
+        self.assertTrue(all(line == line.rstrip() for line in text.splitlines()))
+        for week in (None, '', '2026-1-05', '2026-02-30', '2026-10-19T00:00:00'):
+            plan['week_of'] = week
+            self.assertTrue(serve.handoff_text(plan, {}, {}).startswith('Provisions\n\n'))
 
 
 if __name__ == '__main__':
