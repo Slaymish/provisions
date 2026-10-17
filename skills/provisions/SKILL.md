@@ -59,6 +59,23 @@ you do not need a profile to act on it:
 - Included top-ups carry their final note; extras are one-offs unless they say
   otherwise.
 
+## Filling the trolley
+
+Adding items to a Woolworths NZ cart is possible from an agent and is the end of
+this workflow: fill it, then stop. Three constraints, each discovered the hard way:
+
+- The storefront resets HTTP/2 for very recent Chrome user-agent strings, so a
+  genuine modern UA fails every navigation with ERR_HTTP2_PROTOCOL_ERROR. Override
+  the user agent to a slightly older Chrome version and the same browser works.
+- Nothing can be added until the session has an account, a pickup store and a time
+  slot. Set the store and slot first, and expect a sign-in gate: the cart belongs to
+  an account, so a signed-out session cannot be filled.
+- Search by product name, never by SKU. The SKU is how you confirm you matched the
+  right product, not how you find it.
+
+Stop at the trolley. Checkout, slot confirmation and payment are the person's, and
+no automation may click through a payment step.
+
 ## Learning from the JSON export
 
 Treat `preference_feedback` as explicit corrections. A `text` of `""` is a
