@@ -212,10 +212,14 @@ def handoff_text(plan, selection, profile):
     lines.append("")
 
     def preference_lines(info):
+        # A fresh agent reading the paste has no profile, so the settled text has
+        # to travel here; an edit is the same line with what it replaced beside it.
         if info["user_edited"]:
             lines.append("  now: " + (info["current"] or "(cleared)"))
             if info["suggested"]:
                 lines.append("  was: " + info["suggested"])
+        elif info["current"]:
+            lines.append("  pref: " + info["current"])
 
     unchosen = []
     for si, slot in enumerate(plan.get("slots") or []):
@@ -258,7 +262,7 @@ def handoff_text(plan, selection, profile):
         for option, info in unchosen:
             lines.append("  " + (option.get("name") or "") + " [" + info["key"] + "]")
             preference_lines(info)
-    lines.extend(["", 'For Hermes: rebuild the shop from these choices. Anything after "now:" is my final preference — learn it and do not bring back what I removed.'])
+    lines.extend(["", 'For Hermes: rebuild the shop from these. "pref:" is what I have settled on; "now:" is an edit I just made to "was:", and nothing I removed should come back.'])
     return "\n".join(line.rstrip() for line in "\n".join(lines).splitlines()) + "\n"
 
 

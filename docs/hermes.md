@@ -170,18 +170,24 @@ Acknowledged edits remain in the user's saved export files.
 ## Clipboard handoff
 
 `GET /api/handoff` returns `{"text": "...", "week_of": "..."}`. `week_of` is the
-plan’s date or an empty string. The text starts with the week, store and fulfilment,
+plan's date or an empty string. The text starts with the week, store and fulfilment,
 then lists every slot in plan order with its choice (or `not chosen`) and any
-explicit preference key. Edited preferences have two-space-indented `now:` and
-`was:` lines. Empty final text is `(cleared)`; empty suggestions omit `was:`.
-Untouched preferences have no edit lines.
+explicit preference key.
 
-Included top-ups follow as `name (note)`, or `top-ups: none`, with any edit lines
-beneath them. Non-empty snacks, household and other extras follow. Edited meal
-options that were not chosen appear under `changed but not chosen:` with their
-keys and edit lines. The final instruction tells Hermes to rebuild the shop and
-learn final text without restoring removed preferences. The paste ends in one
-newline. A valid plain `YYYY-MM-DD` week is shown with an English month name.
+Every chosen entry then carries one indented preference block, and the receiving
+agent is expected to have no profile of its own, so the settled text always travels:
+`pref:` is the final text when nothing changed this round, `now:` with `was:` is an
+edit made in the app (an empty final text is `(cleared)`, and an empty suggestion
+omits `was:`), and an entry with no settled text and no edit has no line at all.
+
+Included top-ups follow as `name (note)`, or `top-ups: none`, with the same
+preference block beneath them. Non-empty snacks, household and other extras follow.
+Edited meal options that were not chosen appear under `changed but not chosen:` with
+their keys and preference blocks, so a correction on a meal that lost the vote is
+still visible. The final instruction tells Hermes to rebuild the shop, to treat
+`pref:` as settled and `now:` as an edit of `was:`, and never to restore removed
+text. The paste ends in one newline. A valid plain `YYYY-MM-DD` week is shown with
+an English month name.
 
 The app is the person’s input view and has no list view. Read the paste, apply
 final preferences and build the shop yourself. If durable local acknowledgement

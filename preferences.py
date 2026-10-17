@@ -29,8 +29,9 @@ def context(kind, sid, oid, entry, selection, profile):
     override = profile.get('preference_overrides', {}).get(key)
     notes = selection.get('notes', {}).get(sid, {}) if kind == 'meal' else selection.get('topup_notes', {})
     current = override['text'] if override else notes.get(oid, suggested)
+    # Whitespace is not a preference: a textarea that loses a trailing space is not an edit.
     return {'key': key, 'suggested': suggested, 'current': current,
-            'user_edited': bool(override) or (oid in notes and current != suggested)}
+            'user_edited': bool(override) or (oid in notes and current.strip() != suggested.strip())}
 
 
 def effective_selection(plan, selection, profile):
@@ -44,7 +45,8 @@ def effective_selection(plan, selection, profile):
 
 
 def record_edit(profile, info, text):
-    if text == info['current']:
+    # Trailing whitespace is not a correction; saving one would outrank the stored preference.
+    if text.strip() == (info['current'] or '').strip():
         return
     profile.setdefault('preference_overrides', {})[info['key']] = {
         'id': str(uuid4()), 'key': info['key'], 'suggested': info['suggested'],

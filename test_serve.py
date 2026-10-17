@@ -69,13 +69,13 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual(result['text'], (
             'Provisions · week of 19 October 2026\nSynthetic store · Sunday pickup\n\n'
             'breakfast · Eggs on toast\nslot-2 · Lunch\n\ntop-ups: none\n\n'
-            'For Hermes: rebuild the shop from these choices. Anything after "now:" is my final preference — learn it and do not bring back what I removed.\n'))
+            'For Hermes: rebuild the shop from these. "pref:" is what I have settled on; "now:" is an edit I just made to "was:", and nothing I removed should come back.\n'))
 
     def test_handoff_edited_cleared_and_untouched_preferences(self):
         self.add_preferences()
         self.select(slot='breakfast', option='eggs')
         untouched = self.get('/api/handoff')['text']
-        self.assertIn('breakfast · Eggs on toast [meal:eggs-on-toast]\n', untouched)
+        self.assertIn('breakfast · Eggs on toast [meal:eggs-on-toast]\n  pref: English muffins\n', untouched)
         self.assertNotIn('  now:', untouched)
         self.assertNotIn('  was:', untouched)
         self.select(slot='breakfast', option='eggs', note='Sourdough')
@@ -87,6 +87,30 @@ class SelectionTests(unittest.TestCase):
         cleared = self.get('/api/handoff')['text']
         self.assertIn('  now: (cleared)\n', cleared)
         self.assertNotIn('  was:', cleared)
+
+    def test_handoff_carries_settled_preferences_for_a_fresh_agent(self):
+        # A receiving agent has no profile and no plan: the settled text has to be in the paste.
+        self.add_preferences()
+        self.post('/api/profile', {'preferences': {'meal:eggs-on-toast': 'Sourdough, two eggs'}})
+        self.select(slot='breakfast', option='eggs')
+        text = self.get('/api/handoff')['text']
+        self.assertIn('breakfast · Eggs on toast [meal:eggs-on-toast]\n  pref: Sourdough, two eggs\n', text)
+        self.assertNotIn('  now:', text)
+        # Nothing settled and nothing edited prints no line at all.
+        self.select(slot='breakfast', option='oats')
+        text = self.get('/api/handoff')['text']
+        self.assertIn('breakfast · Oats\n', text)
+        self.assertNotIn('  pref:', text)
+
+    def test_whitespace_only_changes_are_not_edits(self):
+        # A textarea that loses a trailing space must not become a durable correction.
+        self.add_preferences()
+        self.select(slot='breakfast', option='eggs')
+        self.select(slot='breakfast', option='eggs', note='English muffins  ')
+        text = self.get('/api/handoff')['text']
+        self.assertIn('  pref: English muffins\n', text)
+        self.assertNotIn('  now:', text)
+        self.assertNotIn('meal:eggs-on-toast', serve.P.profile().get('preference_overrides') or {})
 
     def test_handoff_keeps_edits_on_unchosen_options(self):
         self.add_preferences()
